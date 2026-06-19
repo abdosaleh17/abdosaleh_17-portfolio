@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdo Saleh | Video Editor & AI Visual Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cinema-black': '#0A0A0F',
+                        'cinema-dark': '#111118',
+                        'cinema-gold': '#C0A062',
+                        'cinema-gold-light': '#D4B87A',
+                        'cinema-red': '#E63946',
+                        'cinema-gray': '#1A1A24',
+                        'cinema-text': '#F0F0F5',
+                        'cinema-muted': '#8A8A9A',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { cursor: none !important; }
+
+        body {
+            background-color: #0A0A0F;
+            color: #F0F0F5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATED BACKGROUND LIGHT ===== */
+        .ambient-light {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .light-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .light-orb-1 {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #C0A062 0%, transparent 70%);
+            top: -10%; left: -10%;
+            animation-delay: 0s;
+        }
+
+        .light-orb-2 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #D4B87A 0%, transparent 70%);
+            bottom: 10%; right: -5%;
+            animation-delay: -7s;
+            animation-duration: 25s;
+        }
+
+        .light-orb-3 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #E63946 0%, transparent 70%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+            animation-duration: 18s;
+            opacity: 0.08;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.1); }
+            50% { transform: translate(-30px, 50px) scale(0.9); }
+            75% { transform: translate(40px, 40px) scale(1.05); }
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s ease-out, width 0.2s ease, height 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor svg {
+            width: 100%;
+            height: 100%;
+            fill: #C0A062;
+            filter: drop-shadow(0 0 8px rgba(192, 160, 98, 0.5));
+        }
+
+        .custom-cursor.hovering {
+            width: 60px;
+            height: 60px;
+        }
+
+        .custom-cursor.hovering svg {
+            fill: #E63946;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: rgba(192, 160, 98, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0F; }
+        ::-webkit-scrollbar-thumb { background: #C0A062; border-radius: 3px; }
+
+        /* Hero */
+        .hero-title span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(90deg);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #C0A062 0%, #E63946 50%, #C0A062 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(26, 26, 36, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 160, 98, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(192, 160, 98, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(192, 160, 98, 0.1);
+        }
+
+        /* Portfolio Items */
+        .portfolio-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 15, 0.9) 100%);
+            opacity: 0.6;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .portfolio-item:hover::before { opacity: 0.3; }
+
+        .portfolio-item .play-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px; height: 60px;
+            background: rgba(192, 160, 98, 0.9);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .portfolio-item:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Section Reveal */
+        .section-reveal {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        /* Service Card */
+        .service-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, #C0A062, #E63946);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::after { transform: scaleX(1); }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: #C0A062;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after { width: 100%; }
+
+        /* Form Inputs */
+        .form-input {
+            background: rgba(26, 26, 36, 0.8);
+            border: 1px solid rgba(192, 160, 98, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #C0A062;
+            box-shadow: 0 0 0 3px rgba(192, 160, 98, 0.1);
+            outline: none;
+        }
+
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float-anim { animation: float 6s ease-in-out infinite; }
+
+        /* Pulse Glow */
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 20px rgba(192, 160, 98, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(192, 160, 98, 0.4); }
+        }
+
+        .pulse-gold { animation: pulse-gold 3s ease-in-out infinite; }
+
+        /* Loading Screen */
+        .loader-screen {
+            position: fixed;
+            inset: 0;
+            background: #0A0A0F;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(192, 160, 98, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #C0A062, #E63946);
+            transition: width 0.3s ease;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu.open { transform: translateX(0); }
+
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Selection */
+        ::selection {
+            background: rgba(192, 160, 98, 0.3);
+            color: #F0F0F5;
+        }
+
+        /* Video Modal */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.95);
+            z-index: 100001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .video-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .video-modal iframe {
+            width: 90%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            border-radius: 16px;
+            border: 1px solid rgba(192, 160, 98, 0.2);
+        }
+
+        .video-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(192, 160, 98, 0.1);
+            border: 1px solid rgba(192, 160, 98, 0.3);
+            color: #C0A062;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: none;
+            transition: all 0.3s ease;
+        }
+
+        .video-close:hover {
+            background: rgba(192, 160, 98, 0.3);
+        }
+
+        /* Link Card */
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(26, 26, 36, 0.6);
+            border: 1px solid rgba(192, 160, 98, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .link-card:hover {
+            border-color: rgba(192, 160, 98, 0.3);
+            background: rgba(192, 160, 98, 0.05);
+            transform: translateX(8px);
+        }
+
+        .link-card .link-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(192, 160, 98, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #C0A062;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="bg-cinema-black text-cinema-text">
+
+    <!-- ===== AMBIENT BACKGROUND LIGHTS ===== -->
+    <div class="ambient-light">
+        <div class="light-orb light-orb-1"></div>
+        <div class="light-orb light-orb-2"></div>
+        <div class="light-orb light-orb-3"></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loader-screen" id="loader">
+        <div class="text-4xl font-display font-bold tracking-widest">
+            <span class="text-cinema-gold">ABDO</span><span class="text-cinema-text">SALEH</span>
+        </div>
+        <div class="loader-bar">
+            <div class="loader-progress" id="loaderProgress"></div>
+        </div>
+        <div class="mt-4 text-cinema-muted text-sm font-mono">LOADING EXPERIENCE...</div>
+    </div>
+
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5v14l11-7z"/>
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+    </div>
+    <div class="cursor-trail" id="cursorTrail"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-6 py-4 transition-all duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#hero" class="text-2xl font-display font-bold tracking-wider">
+                <span class="text-cinema-gold">ABDO</span><span class="text-cinema-text">SALEH</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#about" class="nav-link text-sm font-medium tracking-wider uppercase text-cinema-muted hover:text-cinema-gold transition-colors">About</a>
+                <a href="#portfolio" class="nav-link text-sm font-medium tracking-wider uppercase text-cinema-muted hover:text-cinema-gold transition-colors">Work</a>
+                <a href="#services" class="nav-link text-sm font-medium tracking-wider uppercase text-cinema-muted hover:text-cinema-gold transition-colors">Services</a>
+                <a href="#testimonials" class="nav-link text-sm font-medium tracking-wider uppercase text-cinema-muted hover:text-cinema-gold transition-colors">Clients</a>
+                <a href="#contact" class="magnetic-btn px-6 py-2 bg-cinema-gold text-cinema-black font-semibold text-sm uppercase tracking-wider rounded-full hover:bg-cinema-gold-light transition-colors">
+                    Let's Talk
+                </a>
+            </div>
+
+            <button class="md:hidden text-2xl text-cinema-gold" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed inset-0 bg-cinema-black z-40 flex flex-col items-center justify-center gap-8" id="mobileMenu">
+        <button class="absolute top-6 right-6 text-3xl text-cinema-gold" id="menuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <a href="#about" class="mobile-link text-3xl font-display font-bold text-cinema-text hover:text-cinema-gold transition-colors">About</a>
+        <a href="#portfolio" class="mobile-link text-3xl font-display font-bold text-cinema-text hover:text-cinema-gold transition-colors">Work</a>
+        <a href="#services" class="mobile-link text-3xl font-display font-bold text-cinema-text hover:text-cinema-gold transition-colors">Services</a>
+        <a href="#testimonials" class="mobile-link text-3xl font-display font-bold text-cinema-text hover:text-cinema-gold transition-colors">Clients</a>
+        <a href="#contact" class="mobile-link text-3xl font-display font-bold text-cinema-text hover:text-cinema-gold transition-colors">Contact</a>
+    </div>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden z-10">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-cinema-black/30 via-cinema-black/60 to-cinema-black z-10"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(192,160,98,0.08)_0%,_transparent_70%)]"></div>
+            <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(rgba(192,160,98,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(192,160,98,0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+        </div>
+
+        <div class="absolute top-20 left-10 w-20 h-20 border border-cinema-gold/20 rounded-full float-anim opacity-30"></div>
+        <div class="absolute bottom-40 right-20 w-32 h-32 border border-cinema-red/20 rounded-full float-anim opacity-20" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/3 right-1/4 w-2 h-2 bg-cinema-gold rounded-full pulse-gold"></div>
+
+        <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
+            <div class="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cinema-gold/20 bg-cinema-gold/5">
+                <span class="w-2 h-2 bg-cinema-gold rounded-full animate-pulse"></span>
+                <span class="text-cinema-gold text-xs font-medium tracking-widest uppercase">Available for Projects</span>
+            </div>
+
+            <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight mb-6" id="heroTitle">
+                <span class="block">ABDO SALEH</span>
+                <span class="block gradient-text">VIDEO EDITOR</span>
+                <span class="block text-3xl md:text-5xl lg:text-6xl mt-4">AI VISUAL CREATOR</span>
+            </h1>
+
+            <p class="hero-subtitle text-lg md:text-xl text-cinema-muted max-w-2xl mx-auto mb-10 leading-relaxed" id="heroSubtitle">
+                From viral Reels to cinematic documentaries. Every frame engineered for retention, impact, and visual identity.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#portfolio" class="magnetic-btn group px-8 py-4 bg-cinema-gold text-cinema-black font-bold text-sm uppercase tracking-wider rounded-full hover:bg-cinema-gold-light transition-all duration-300 flex items-center gap-3">
+                    <i class="fas fa-play text-xs"></i>
+                    Watch Showreel
+                </a>
+                <a href="#contact" class="magnetic-btn group px-8 py-4 border border-cinema-gold/30 text-cinema-gold font-bold text-sm uppercase tracking-wider rounded-full hover:bg-cinema-gold/10 hover:border-cinema-gold transition-all duration-300 flex items-center gap-3">
+                    <i class="fas fa-rocket text-xs"></i>
+                    Start Your Project
+                </a>
+            </div>
+
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+                <span class="text-xs tracking-widest uppercase text-cinema-muted">Scroll</span>
+                <div class="w-px h-12 bg-gradient-to-b from-cinema-gold to-transparent"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ABOUT SECTION ===== -->
+    <section id="about" class="relative py-32 px-6 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="section-reveal">
+                <span class="text-cinema-gold text-sm font-medium tracking-widest uppercase mb-4 block">01 / About</span>
+                <h2 class="text-4xl md:text-6xl font-display font-bold mb-16">
+                    The Editor Behind<br>
+                    <span class="gradient-text">The Vision</span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="section-reveal space-y-6">
+                    <p class="text-lg text-cinema-muted leading-relaxed">
+                        I don't just cut footage — I <span class="text-cinema-gold font-semibold">sculpt narratives</span>. With <span class="text-cinema-gold font-bold">3 years of experience</span> in video editing and a strong foundation in Photoshop graphics and next-gen AI filmmaking tools, I build the exact visual identity your project needs to dominate the feed.
+                    </p>
+                    <p class="text-lg text-cinema-muted leading-relaxed">
+                        From scroll-stopping short-form Reels to cinematic, long-form YouTube documentaries, every edit is backed by data-driven pacing and audience psychology.
+                    </p>
+
+                    <div class="flex flex-wrap gap-3 pt-4">
+                        <span class="px-4 py-2 rounded-full border border-cinema-gold/20 text-cinema-gold text-sm">Premiere Pro</span>
+                        <span class="px-4 py-2 rounded-full border border-cinema-gold/20 text-cinema-gold text-sm">CapCut</span>
+                        <span class="px-4 py-2 rounded-full border border-cinema-gold/20 text-cinema-gold text-sm">Photoshop</span>
+                        <span class="px-4 py-2 rounded-full border border-cinema-gold/20 text-cinema-gold text-sm">AI Tools</span>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="glass-card p-8 rounded-2xl section-reveal">
+                        <div class="text-4xl md:text-5xl font-display font-bold text-cinema-gold mb-2">
+                            <span class="stat-number" data-target="3">0</span>+
+                        </div>
+                        <div class="text-cinema-muted text-sm uppercase tracking-wider">Years Experience</div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl section-reveal">
+                        <div class="text-4xl md:text-5xl font-display font-bold text-cinema-gold mb-2">
+                            <span class="stat-number" data-target="150">0</span>+
+                        </div>
+                        <div class="text-cinema-muted text-sm uppercase tracking-wider">Projects Delivered</div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl section-reveal">
+                        <div class="text-4xl md:text-5xl font-display font-bold text-cinema-gold mb-2">
+                            <span class="stat-number" data-target="98">0</span>%
+                        </div>
+                        <div class="text-cinema-muted text-sm uppercase tracking-wider">Retention Rate</div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl section-reveal">
+                        <div class="text-4xl md:text-5xl font-display font-bold text-cinema-gold mb-2">
+                            <span class="stat-number" data-target="50">0</span>+
+                        </div>
+                        <div class="text-cinema-muted text-sm uppercase tracking-wider">Happy Clients</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PORTFOLIO SECTION ===== -->
+    <section id="portfolio" class="relative py-32 px-6 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="section-reveal flex flex-col md:flex-row md:items-end md:justify-between mb-16">
+                <div>
+                    <span class="text-cinema-gold text-sm font-medium tracking-widest uppercase mb-4 block">02 / Portfolio</span>
+                    <h2 class="text-4xl md:text-6xl font-display font-bold">
+                        Selected<br>
+                        <span class="gradient-text">Works</span>
+                    </h2>
+                </div>
+                <a href="#" class="mt-6 md:mt-0 text-cinema-gold text-sm font-medium tracking-wider uppercase hover:text-cinema-gold-light transition-colors flex items-center gap-2">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Video Showcase -->
+            <div class="mb-12 section-reveal">
+                <div class="glass-card rounded-2xl overflow-hidden relative group cursor-none" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+                    <div class="aspect-video bg-cinema-gray relative flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cinema-black/80 via-transparent to-transparent z-10"></div>
+                        <i class="fas fa-film text-8xl text-cinema-gold/10"></i>
+                        <div class="absolute inset-0 flex items-center justify-center z-20">
+                            <div class="w-20 h-20 rounded-full bg-cinema-gold/90 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-play text-cinema-black text-2xl ml-1"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-6 left-6 z-20">
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider mb-2 block">Showreel 2026</span>
+                            <h3 class="text-2xl font-display font-bold">Watch My Latest Work</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Portfolio Item 1: Reels -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal cursor-none" onclick="openVideoModal('https://www.youtube.com/embed/VIDEO_ID_1')">
+                    <div class="aspect-[9/16] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-mobile-alt text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-play text-cinema-black text-lg ml-1"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-mobile-screen text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">Reels</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">Short-Form Viral Edits</h3>
+                        <p class="text-cinema-muted text-sm">Scroll-stopping content optimized for maximum retention and engagement.</p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 2: Documentaries -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal cursor-none" onclick="openVideoModal('https://www.youtube.com/embed/VIDEO_ID_2')">
+                    <div class="aspect-[9/16] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-film text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-play text-cinema-black text-lg ml-1"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-video text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">Documentary</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">Long-Form YouTube Docs</h3>
+                        <p class="text-cinema-muted text-sm">Cinematic storytelling with precise pacing and emotional arcs.</p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 3: AI -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal cursor-none" onclick="openVideoModal('https://www.youtube.com/embed/VIDEO_ID_3')">
+                    <div class="aspect-[9/16] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-robot text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-play text-cinema-black text-lg ml-1"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-brain text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">AI Visuals</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">AI-Generated Visuals</h3>
+                        <p class="text-cinema-muted text-sm">Next-gen filmmaking with AI-powered graphics and visual effects.</p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 4: Thumbnails -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal">
+                    <div class="aspect-[16/9] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-image text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-eye text-cinema-black text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-palette text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">Thumbnails</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">Click-Worthy Thumbnails</h3>
+                        <p class="text-cinema-muted text-sm">High-CTR thumbnails designed in Photoshop for maximum clicks.</p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 5: Posters -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal">
+                    <div class="aspect-[16/9] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-paint-brush text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-eye text-cinema-black text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-scroll text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">Posters</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">Cinematic Posters</h3>
+                        <p class="text-cinema-muted text-sm">Movie-grade poster designs for brands and content creators.</p>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 6: Motion Graphics -->
+                <div class="portfolio-item glass-card rounded-2xl overflow-hidden group section-reveal cursor-none" onclick="openVideoModal('https://www.youtube.com/embed/VIDEO_ID_4')">
+                    <div class="aspect-[16/9] bg-cinema-gray relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-wind text-6xl text-cinema-gold/20"></i>
+                        </div>
+                        <div class="play-icon">
+                            <i class="fas fa-play text-cinema-black text-lg ml-1"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-bezier-curve text-cinema-gold text-sm"></i>
+                            <span class="text-cinema-gold text-xs font-medium uppercase tracking-wider">Motion</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold mb-2">Motion Graphics</h3>
+                        <p class="text-cinema-muted text-sm">Dynamic motion design and kinetic typography for brands.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- External Links -->
+            <div class="mt-12 grid md:grid-cols-2 gap-4 section-reveal">
+                <a href="https://drive.google.com/drive/folders/10Cikxh130UbnAXMf4lyq8x29gFxAM5qD?usp=drive_link" target="_blank" class="link-card">
+                    <div class="link-icon"><i class="fab fa-google-drive"></i></div>
+                    <div>
+                        <div class="font-semibold text-cinema-text">Reels & Long-Form Videos</div>
+                        <div class="text-cinema-muted text-sm">View on Google Drive →</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1GOeB0_3ZLc7oHyl-dGNLUrQdeJz3dI-i?usp=drive_link" target="_blank" class="link-card">
+                    <div class="link-icon"><i class="fab fa-google-drive"></i></div>
+                    <div>
+                        <div class="font-semibold text-cinema-text">AI Portfolio</div>
+                        <div class="text-cinema-muted text-sm">View on Google Drive →</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1kiEmzAFCUC1QALm0EoUC6gb92srLGpzH?usp=drive_link" target="_blank" class="link-card">
+                    <div class="link-icon"><i class="fab fa-google-drive"></i></div>
+                    <div>
+                        <div class="font-semibold text-cinema-text">Thumbnails & Posters</div>
+                        <div class="text-cinema-muted text-sm">View on Google Drive →</div>
+                    </div>
+                </a>
+                <a href="https://www.youtube.com/@YOUR_CHANNEL" target="_blank" class="link-card">
+                    <div class="link-icon"><i class="fab fa-youtube"></i></div>
+                    <div>
+                        <div class="font-semibold text-cinema-text">YouTube Channel</div>
+                        <div class="text-cinema-muted text-sm">Watch full videos →</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SERVICES SECTION ===== -->
+    <section id="services" class="relative py-32 px-6 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="section-reveal text-center mb-16">
+                <span class="text-cinema-gold text-sm font-medium tracking-widest uppercase mb-4 block">03 / Services</span>
+                <h2 class="text-4xl md:text-6xl font-display font-bold">
+                    What I Can<br>
+                    <span class="gradient-text">Create For You</span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="service-card glass-card p-10 rounded-2xl section-reveal group">
+                    <div class="w-16 h-16 rounded-2xl bg-cinema-gold/10 flex items-center justify-center mb-6 group-hover:bg-cinema-gold/20 transition-colors">
+                        <i class="fas fa-bolt text-2xl text-cinema-gold"></i>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">Reels Package</h3>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">5 high-energy Reels with sound design, captions, and trending audio integration. Optimized for TikTok, Instagram, and YouTube Shorts.</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Color Grading</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Sound Design</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Captions & Subtitles</li>
+                    </ul>
+                    <div class="flex items-center justify-between pt-6 border-t border-cinema-gold/10">
+                        <span class="text-cinema-gold font-display font-bold text-xl">$XXX</span>
+                        <span class="text-cinema-muted text-sm">Starting Price</span>
+                    </div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="service-card glass-card p-10 rounded-2xl section-reveal group relative">
+                    <div class="absolute top-4 right-4 px-3 py-1 bg-cinema-red/20 text-cinema-red text-xs font-bold uppercase tracking-wider rounded-full">Popular</div>
+                    <div class="w-16 h-16 rounded-2xl bg-cinema-gold/10 flex items-center justify-center mb-6 group-hover:bg-cinema-gold/20 transition-colors">
+                        <i class="fas fa-clapperboard text-2xl text-cinema-gold"></i>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">YouTube Documentary</h3>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">Full cinematic edit with advanced color grading, sound mixing, and thumbnail design. For creators who want to level up their content.</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Full Edit & Color Grade</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Sound Mixing</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Custom Thumbnails</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>2 Revision Rounds</li>
+                    </ul>
+                    <div class="flex items-center justify-between pt-6 border-t border-cinema-gold/10">
+                        <span class="text-cinema-gold font-display font-bold text-xl">$XXX</span>
+                        <span class="text-cinema-muted text-sm">Starting Price</span>
+                    </div>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="service-card glass-card p-10 rounded-2xl section-reveal group">
+                    <div class="w-16 h-16 rounded-2xl bg-cinema-gold/10 flex items-center justify-center mb-6 group-hover:bg-cinema-gold/20 transition-colors">
+                        <i class="fas fa-brain text-2xl text-cinema-gold"></i>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">AI Visual Identity</h3>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">AI-generated visuals, brand kit, and custom graphics. Perfect for brands wanting a futuristic, cutting-edge visual presence.</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>AI-Generated Assets</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Brand Kit Design</li>
+                        <li class="flex items-center gap-3 text-sm text-cinema-muted"><i class="fas fa-check text-cinema-gold text-xs"></i>Motion Graphics</li>
+                    </ul>
+                    <div class="flex items-center justify-between pt-6 border-t border-cinema-gold/10">
+                        <span class="text-cinema-gold font-display font-bold text-xl">$XXX</span>
+                        <span class="text-cinema-muted text-sm">Starting Price</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS SECTION ===== -->
+    <section id="testimonials" class="relative py-32 px-6 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="section-reveal text-center mb-16">
+                <span class="text-cinema-gold text-sm font-medium tracking-widest uppercase mb-4 block">04 / Testimonials</span>
+                <h2 class="text-4xl md:text-6xl font-display font-bold">
+                    What Clients<br>
+                    <span class="gradient-text">Are Saying</span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl section-reveal relative">
+                    <div class="text-6xl text-cinema-gold/10 font-display absolute top-4 right-4">"</div>
+                    <div class="flex gap-1 mb-4">
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                    </div>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">"Working with Abdo was a game-changer. Our retention rate jumped 40% after he took over our edits. The pacing is just perfect."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-cinema-gray flex items-center justify-center"><i class="fas fa-user text-cinema-muted"></i></div>
+                        <div><div class="font-semibold text-cinema-text">Client Name</div><div class="text-cinema-muted text-sm">YouTuber, 500K+ Subs</div></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl section-reveal relative">
+                    <div class="text-6xl text-cinema-gold/10 font-display absolute top-4 right-4">"</div>
+                    <div class="flex gap-1 mb-4">
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                    </div>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">"The AI visuals he created for our brand launch were mind-blowing. People kept asking who made them. Absolutely recommend."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-cinema-gray flex items-center justify-center"><i class="fas fa-user text-cinema-muted"></i></div>
+                        <div><div class="font-semibold text-cinema-text">Brand Manager</div><div class="text-cinema-muted text-sm">Tech Startup</div></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl section-reveal relative">
+                    <div class="text-6xl text-cinema-gold/10 font-display absolute top-4 right-4">"</div>
+                    <div class="flex gap-1 mb-4">
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                        <i class="fas fa-star text-cinema-gold text-sm"></i>
+                    </div>
+                    <p class="text-cinema-muted mb-6 leading-relaxed">"Fast turnaround, incredible attention to detail, and the thumbnails alone boosted our CTR by 25%. Abdo is the real deal."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-cinema-gray flex items-center justify-center"><i class="fas fa-user text-cinema-muted"></i></div>
+                        <div><div class="font-semibold text-cinema-text">Content Creator</div><div class="text-cinema-muted text-sm">Instagram, 1M+ Followers</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT SECTION ===== -->
+    <section id="contact" class="relative py-32 px-6 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16">
+                <div class="section-reveal">
+                    <span class="text-cinema-gold text-sm font-medium tracking-widest uppercase mb-4 block">05 / Contact</span>
+                    <h2 class="text-4xl md:text-5xl font-display font-bold mb-6">
+                        Let's Create<br>
+                        <span class="gradient-text">Something Viral</span>
+                    </h2>
+                    <p class="text-cinema-muted text-lg mb-10 leading-relaxed">
+                        Drop your project details below. I'll review your concept and get back to you within 24 hours with a custom plan.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-cinema-gold/10 flex items-center justify-center">
+                                <i class="fab fa-whatsapp text-cinema-gold text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-cinema-muted">WhatsApp</div>
+                                <a href="https://wa.me/201020361377" target="_blank" class="text-cinema-text font-semibold hover:text-cinema-gold transition-colors">+20 102 036 1377</a>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-cinema-gold/10 flex items-center justify-center">
+                                <i class="fas fa-envelope text-cinema-gold text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-cinema-muted">Email</div>
+                                <a href="mailto:abdomsaleh90@gmail.com" class="text-cinema-text font-semibold hover:text-cinema-gold transition-colors">abdomsaleh90@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-cinema-gold/10 flex items-center justify-center">
+                                <i class="fas fa-clock text-cinema-gold text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-cinema-muted">Response Time</div>
+                                <div class="text-cinema-text font-semibold">Within 24 Hours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-reveal">
+                    <form class="glass-card p-8 md:p-10 rounded-2xl space-y-6" id="contactForm">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-cinema-muted mb-2">Your Name</label>
+                                <input type="text" class="form-input w-full px-4 py-3 rounded-xl text-cinema-text placeholder-cinema-muted/50" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-cinema-muted mb-2">Email</label>
+                                <input type="email" class="form-input w-full px-4 py-3 rounded-xl text-cinema-text placeholder-cinema-muted/50" placeholder="john@example.com">
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-cinema-muted mb-2">Project Type</label>
+                                <select class="form-input w-full px-4 py-3 rounded-xl text-cinema-text">
+                                    <option value="" class="bg-cinema-black">Select a service</option>
+                                    <option value="reels" class="bg-cinema-black">Reels Package</option>
+                                    <option value="documentary" class="bg-cinema-black">YouTube Documentary</option>
+                                    <option value="ai" class="bg-cinema-black">AI Visual Identity</option>
+                                    <option value="other" class="bg-cinema-black">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-cinema-muted mb-2">Budget Range</label>
+                                <select class="form-input w-full px-4 py-3 rounded-xl text-cinema-text">
+                                    <option value="" class="bg-cinema-black">Select budget</option>
+                                    <option value="500-1000" class="bg-cinema-black">$500 - $1,000</option>
+                                    <option value="1000-2500" class="bg-cinema-black">$1,000 - $2,500</option>
+                                    <option value="2500-5000" class="bg-cinema-black">$2,500 - $5,000</option>
+                                    <option value="5000+" class="bg-cinema-black">$5,000+</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-cinema-muted mb-2">Project Details</label>
+                            <textarea rows="5" class="form-input w-full px-4 py-3 rounded-xl text-cinema-text placeholder-cinema-muted/50 resize-none" placeholder="Tell me about your project, goals, and timeline..."></textarea>
+                        </div>
+                        <button type="submit" class="magnetic-btn w-full py-4 bg-cinema-gold text-cinema-black font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-cinema-gold-light transition-all duration-300 flex items-center justify-center gap-3">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="relative py-16 px-6 border-t border-cinema-gold/10 z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="text-center md:text-left">
+                    <div class="text-2xl font-display font-bold tracking-wider mb-2">
+                        <span class="text-cinema-gold">ABDO</span><span class="text-cinema-text">SALEH</span>
+                    </div>
+                    <p class="text-cinema-muted text-sm">Video Editor & AI Visual Creator</p>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <a href="#" class="w-10 h-10 rounded-full bg-cinema-gray flex items-center justify-center text-cinema-muted hover:text-cinema-gold hover:bg-cinema-gold/10 transition-all">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-cinema-gray flex items-center justify-center text-cinema-muted hover:text-cinema-gold hover:bg-cinema-gold/10 transition-all">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-cinema-gray flex items-center justify-center text-cinema-muted hover:text-cinema-gold hover:bg-cinema-gold/10 transition-all">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-cinema-gray flex items-center justify-center text-cinema-muted hover:text-cinema-gold hover:bg-cinema-gold/10 transition-all">
+                        <i class="fab fa-behance"></i>
+                    </a>
+                </div>
+
+                <div class="text-cinema-muted text-sm">
+                    © 2026 Abdo Saleh. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== VIDEO MODAL ===== -->
+    <div class="video-modal" id="videoModal">
+        <button class="video-close" onclick="closeVideoModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <iframe id="videoFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // Register GSAP Plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ===== LOADER =====
+        const loader = document.getElementById('loader');
+        const loaderProgress = document.getElementById('loaderProgress');
+        let progress = 0;
+
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    gsap.to(loader, {
+                        opacity: 0,
+                        duration: 0.8,
+                        ease: 'power2.inOut',
+                        onComplete: () => {
+                            loader.style.display = 'none';
+                            initAnimations();
+                        }
+                    });
+                }, 300);
+            }
+            loaderProgress.style.width = progress + '%';
+        }, 100);
+
+        // ===== CUSTOM CURSOR =====
+        const cursor = document.getElementById('cursor');
+        const cursorTrail = document.getElementById('cursorTrail');
+        let mouseX = 0, mouseY = 0;
+        let trailX = 0, trailY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+
+            trailX += (mouseX - trailX) * 0.15;
+            trailY += (mouseY - trailY) * 0.15;
+            cursorTrail.style.left = trailX + 'px';
+            cursorTrail.style.top = trailY + 'px';
+
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        const hoverElements = document.querySelectorAll('a, button, .portfolio-item, .glass-card, .service-card, .link-card');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+
+        // ===== NAVBAR SCROLL =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            if (currentScroll > 100) {
+                navbar.style.background = 'rgba(10, 10, 15, 0.9)';
+                navbar.style.backdropFilter = 'blur(20px)';
+            } else {
+                navbar.style.background = 'transparent';
+                navbar.style.backdropFilter = 'none';
+            }
+        });
+
+        // ===== MOBILE MENU =====
+        const menuToggle = document.getElementById('menuToggle');
+        const menuClose = document.getElementById('menuClose');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuToggle.addEventListener('click', () => mobileMenu.classList.add('open'));
+        menuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        });
+
+        // ===== VIDEO MODAL =====
+        function openVideoModal(url) {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('videoFrame');
+            frame.src = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('videoFrame');
+            modal.classList.remove('active');
+            frame.src = '';
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('videoModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeVideoModal();
+        });
+
+        // ===== INIT ANIMATIONS =====
+        function initAnimations() {
+            const heroTitle = document.getElementById('heroTitle');
+            const titleLines = heroTitle.querySelectorAll('span');
+
+            gsap.to(titleLines, {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                duration: 1.2,
+                stagger: 0.2,
+                ease: 'power4.out',
+                delay: 0.2
+            });
+
+            gsap.to('#heroSubtitle', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power3.out',
+                delay: 0.8
+            });
+
+            gsap.from('.magnetic-btn', {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'power3.out',
+                delay: 1.2
+            });
+
+            const sectionReveals = document.querySelectorAll('.section-reveal');
+            sectionReveals.forEach((el, i) => {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    },
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: 'power3.out',
+                    delay: i * 0.05
+                });
+            });
+
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.dataset.target);
+                gsap.to(stat, {
+                    scrollTrigger: {
+                        trigger: stat,
+                        start: 'top 90%'
+                    },
+                    innerText: target,
+                    duration: 2,
+                    snap: { innerText: 1 },
+                    ease: 'power2.out'
+                });
+            });
+
+            gsap.from('.portfolio-item', {
+                scrollTrigger: { trigger: '#portfolio', start: 'top 70%' },
+                opacity: 0, y: 60, duration: 0.8, stagger: 0.1, ease: 'power3.out'
+            });
+
+            gsap.from('.service-card', {
+                scrollTrigger: { trigger: '#services', start: 'top 70%' },
+                opacity: 0, y: 80, duration: 0.8, stagger: 0.15, ease: 'power3.out'
+            });
+
+            gsap.from('.testimonial-card', {
+                scrollTrigger: { trigger: '#testimonials', start: 'top 70%' },
+                opacity: 0, y: 50, duration: 0.8, stagger: 0.1, ease: 'power3.out'
+            });
+
+            gsap.to('.float-anim', {
+                scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 },
+                y: -100, ease: 'none'
+            });
+        }
+
+        // ===== MAGNETIC BUTTON =====
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ===== FORM =====
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                btn.style.background = '#22c55e';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                    e.target.reset();
+                }, 2000);
+            }, 1500);
+        });
+
+        // ===== GLITCH =====
+        setInterval(() => {
+            const glitchText = document.querySelector('.gradient-text');
+            if (glitchText && Math.random() > 0.95) {
+                glitchText.style.textShadow = '2px 0 #E63946, -2px 0 #C0A062';
+                setTimeout(() => { glitchText.style.textShadow = 'none'; }, 100);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
