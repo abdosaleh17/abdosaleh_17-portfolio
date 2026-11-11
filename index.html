@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,12 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         brand: '#DC5621',
-                        dark: '#121212',
-                        card: '#1A1A1A'
                     },
                     fontFamily: {
                         sans: ['Inter', 'Cairo', 'sans-serif'],
@@ -24,26 +23,254 @@
         }
     </script>
     <style>
-        body { background-color: #121212; color: #ffffff; }
-        .glass { background: rgba(26, 26, 26, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(220, 86, 33, 0.2); }
-        .glow-hover:hover { box-shadow: 0 0 35px rgba(220, 86, 33, 0.35); border-color: #DC5621; }
-        .gradient-text { background: linear-gradient(135deg, #FF8C42, #DC5621); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* Theme CSS Variables for Seamless Color Inversion */
+        :root {
+            --bg-main: #F8F6F2;
+            --bg-sec: #EFECE6;
+            --text-main: #121212;
+            --text-muted: #52525B;
+            --glass-bg: rgba(255, 255, 255, 0.78);
+            --glass-border: rgba(220, 86, 33, 0.25);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 12px 32px rgba(18, 18, 18, 0.06);
+        }
+
+        html.dark {
+            --bg-main: #121212;
+            --bg-sec: #0A0A0A;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --glass-bg: rgba(26, 26, 26, 0.78);
+            --glass-border: rgba(220, 86, 33, 0.22);
+            --input-bg: rgba(0, 0, 0, 0.55);
+            --card-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1), color 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        .sec-bg {
+            background-color: var(--bg-sec);
+            transition: background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .text-theme-muted {
+            color: var(--text-muted);
+            transition: color 0.5s ease;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow);
+            transition: background-color 0.6s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+        }
+
+        .input-theme {
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s ease;
+        }
+
+        .glow-hover:hover {
+            box-shadow: 0 0 35px rgba(220, 86, 33, 0.35);
+            border-color: #DC5621;
+            transform: translateY(-4px);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #FF8C42, #DC5621);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Morph Theme Ripple Overlay */
+        #theme-morph-circle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            clip-path: circle(0px at 90% 40px);
+            transition: clip-path 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* Toggle Icon Morph Animation */
+        .theme-icon-wrapper {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+        .sun-svg, .moon-svg {
+            position: absolute;
+            inset: 0;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
+        html.dark .sun-svg {
+            transform: rotate(0deg) scale(1);
+            opacity: 1;
+        }
+        html.dark .moon-svg {
+            transform: rotate(-120deg) scale(0);
+            opacity: 0;
+        }
+        html:not(.dark) .sun-svg {
+            transform: rotate(120deg) scale(0);
+            opacity: 0;
+        }
+        html:not(.dark) .moon-svg {
+            transform: rotate(0deg) scale(1);
+            opacity: 1;
+        }
+
+        /* Custom 3D Cartoon Smiley Cursor (Desktop Only) */
+        @media (pointer: fine) {
+            body, a, button, input, select, textarea {
+                cursor: none !important;
+            }
+        }
+        @media (pointer: coarse) {
+            #smiley-cursor {
+                display: none !important;
+            }
+        }
+
+        #smiley-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 46px;
+            height: 46px;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+            filter: drop-shadow(0 8px 14px rgba(220, 86, 33, 0.45));
+            transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+        }
+
+        #smiley-cursor.cursor-hover {
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 10px 20px rgba(220, 86, 33, 0.65));
+        }
+
+        #smiley-cursor.cursor-click svg {
+            transform: scale(0.82) rotate(-8deg);
+        }
+
+        #smiley-cursor svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-brand selection:text-white">
+
+    <!-- Morphing Theme Overlay -->
+    <div id="theme-morph-circle"></div>
+
+    <!-- 3D Cartoon Interactive Smiley Cursor -->
+    <div id="smiley-cursor">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- 3D Sphere Gradient -->
+                <radialGradient id="sphere3D" cx="32%" cy="28%" r="70%">
+                    <stop offset="0%" stop-color="#FFE066"/>
+                    <stop offset="45%" stop-color="#FF922B"/>
+                    <stop offset="85%" stop-color="#DC5621"/>
+                    <stop offset="100%" stop-color="#8A2be2" stop-opacity="0.2"/>
+                </radialGradient>
+                <!-- Specular 3D Highlight -->
+                <radialGradient id="gloss" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+
+            <!-- Base 3D Sphere -->
+            <circle cx="50" cy="50" r="45" fill="url(#sphere3D)" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.35"/>
+            <!-- Top Left 3D Gloss Reflection -->
+            <ellipse cx="34" cy="26" rx="18" ry="10" transform="rotate(-25 34 26)" fill="url(#gloss)"/>
+
+            <!-- Cheek Blushes -->
+            <ellipse id="cheek-l" cx="24" cy="58" rx="7" ry="4.5" fill="#FF3B30" fill-opacity="0.45"/>
+            <ellipse id="cheek-r" cx="76" cy="58" rx="7" ry="4.5" fill="#FF3B30" fill-opacity="0.45"/>
+
+            <!-- Open Eyes Group -->
+            <g id="eyes-open">
+                <ellipse cx="35" cy="43" rx="5.5" ry="7.5" fill="#18181B"/>
+                <circle cx="33" cy="40" r="2.2" fill="#FFFFFF"/>
+                <ellipse cx="65" cy="43" rx="5.5" ry="7.5" fill="#18181B"/>
+                <circle cx="63" cy="40" r="2.2" fill="#FFFFFF"/>
+            </g>
+
+            <!-- Blinking / Wink Eyes Group (Shown on Click) -->
+            <g id="eyes-blink" style="display: none;">
+                <path d="M 27 43 Q 35 34 43 43" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                <path d="M 57 43 Q 65 34 73 43" stroke="#18181B" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            </g>
+
+            <!-- Normal / Moving Smile -->
+            <path id="mouth-smile" d="M 32 60 Q 50 75 68 60" stroke="#18181B" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+            <!-- Big Excited Laugh Mouth (Shown on Hover & Fast Movement) -->
+            <g id="mouth-laugh" style="display: none;">
+                <path d="M 28 56 Q 50 84 72 56 Z" fill="#18181B"/>
+                <path d="M 37 67 Q 50 76 63 67 Z" fill="#FF4D4D"/>
+            </g>
+        </svg>
+    </div>
 
     <!-- Navbar -->
     <header class="fixed top-0 w-full z-50 px-4 py-4">
         <div class="max-w-6xl mx-auto glass rounded-2xl px-6 py-3 flex items-center justify-between">
             <a href="#" class="text-xl font-black tracking-tight">ABDO <span class="text-brand">SALEH</span></a>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-300">
+            
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-theme-muted">
                 <a href="#portfolio" class="hover:text-brand transition">Portfolio</a>
                 <a href="#testimonials" class="hover:text-brand transition">Client Reviews</a>
                 <a href="#contact" class="hover:text-brand transition">Contact</a>
+                <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="hover:text-brand transition">Instagram</a>
             </nav>
-            <a href="https://wa.me/201020361366" target="_blank" class="bg-brand hover:bg-orange-600 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-xl transition">
-                Let's Talk
-            </a>
+
+            <div class="flex items-center gap-3">
+                <!-- Morphing Dark / Light Mode Toggle Button -->
+                <button id="theme-toggle" onclick="toggleTheme(event)" aria-label="Toggle Theme" class="glass p-2.5 rounded-xl hover:border-brand transition flex items-center justify-center" title="Switch Light / Dark Mode">
+                    <div class="theme-icon-wrapper">
+                        <!-- Sun Icon (Shows in Dark Mode to switch to Light) -->
+                        <svg class="sun-svg text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon Icon (Shows in Light Mode to switch to Dark) -->
+                        <svg class="moon-svg text-brand" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </div>
+                </button>
+
+                <a href="https://wa.me/201020361366" target="_blank" rel="noopener noreferrer" class="bg-brand hover:bg-orange-600 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-md">
+                    Let's Talk
+                </a>
+            </div>
         </div>
     </header>
 
@@ -56,14 +283,14 @@
             <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6">
                 Crafting High-Impact <span class="gradient-text">Commercials & AI Visuals</span> That Convert.
             </h1>
-            <p class="text-gray-400 text-base md:text-lg max-w-2xl mx-auto mb-10">
+            <p class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
                 Transforming ideas into cinematic stories, viral educational promos, and next-gen AI commercials for top instructors and brands across Egypt & the MENA region.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="#portfolio" class="bg-brand hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg">
                     Explore My Work
                 </a>
-                <a href="https://wa.me/201020361366" target="_blank" class="glass hover:border-brand text-white font-bold px-8 py-4 rounded-2xl transition">
+                <a href="https://wa.me/201020361366" target="_blank" rel="noopener noreferrer" class="glass hover:border-brand font-bold px-8 py-4 rounded-2xl transition">
                     Book a Project
                 </a>
             </div>
@@ -75,48 +302,48 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">Featured <span class="gradient-text">Portfolio</span></h2>
-                <p class="text-gray-400">Select a category below to explore full high-resolution projects on Google Drive</p>
+                <p class="text-theme-muted">Select a category below to explore full high-resolution projects on Google Drive</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Card 1: Commercial Edits -->
-                <a href="https://drive.google.com/drive/folders/1vB8Ii4RROFm3mtAcQOpeEPGvkdO3GWp9" target="_blank" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
-                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black">
+                <a href="https://drive.google.com/drive/folders/1vB8Ii4RROFm3mtAcQOpeEPGvkdO3GWp9" target="_blank" rel="noopener noreferrer" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
+                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-inner">
                         <img src="commercial-edits.jpg" alt="Commercial Edits" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     <h3 class="text-2xl font-black mb-2">🎬 Commercial Edits</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex-1">
+                    <p class="text-theme-muted text-sm mb-6 flex-1">
                         High-retention promotional videos, center & online course launches, dynamic reels, and cinematic storytelling.
                     </p>
-                    <div class="w-full py-3.5 rounded-xl bg-brand/20 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
+                    <div class="w-full py-3.5 rounded-xl bg-brand/15 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
                         Open Google Drive Folder →
                     </div>
                 </a>
 
                 <!-- Card 2: AI Commercials -->
-                <a href="https://drive.google.com/drive/folders/1zTOmqPmZyX603gBBqxJ2WwJpB4uAv5A7?usp=drive_link" target="_blank" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
-                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black">
+                <a href="https://drive.google.com/drive/folders/1zTOmqPmZyX603gBBqxJ2WwJpB4uAv5A7?usp=drive_link" target="_blank" rel="noopener noreferrer" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
+                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-inner">
                         <img src="ai-commercials.jpg" alt="AI Commercials" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     <h3 class="text-2xl font-black mb-2">⚡ AI Commercials</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex-1">
+                    <p class="text-theme-muted text-sm mb-6 flex-1">
                         Next-gen AI video campaigns, 3D visual assets, brand identity animations, and hyper-realistic product commercials.
                     </p>
-                    <div class="w-full py-3.5 rounded-xl bg-brand/20 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
+                    <div class="w-full py-3.5 rounded-xl bg-brand/15 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
                         Open Google Drive Folder →
                     </div>
                 </a>
 
                 <!-- Card 3: Thumbnails & Posters -->
-                <a href="https://drive.google.com/drive/folders/1kiEmzAFCUC1QALm0EoUC6gb92srLGpzH?usp=sharing" target="_blank" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
-                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black">
+                <a href="https://drive.google.com/drive/folders/1kiEmzAFCUC1QALm0EoUC6gb92srLGpzH?usp=sharing" target="_blank" rel="noopener noreferrer" class="glass rounded-3xl p-6 transition duration-300 glow-hover group flex flex-col">
+                    <div class="w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-inner">
                         <img src="thumbnails-posters.jpg" alt="Thumbnails & Posters" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     <h3 class="text-2xl font-black mb-2">🖼️ Thumbnails & Posters</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex-1">
+                    <p class="text-theme-muted text-sm mb-6 flex-1">
                         High-CTR YouTube thumbnails, social media campaign posters, and visual branding designs that grab instant attention.
                     </p>
-                    <div class="w-full py-3.5 rounded-xl bg-brand/20 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
+                    <div class="w-full py-3.5 rounded-xl bg-brand/15 border border-brand/40 text-brand font-bold text-center group-hover:bg-brand group-hover:text-white transition">
                         Open Google Drive Folder →
                     </div>
                 </a>
@@ -125,83 +352,83 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-20 px-4 bg-black/40" dir="rtl">
+    <section id="testimonials" class="py-20 px-4 sec-bg" dir="rtl">
         <div class="max-w-6xl mx-auto font-arabic">
             <div class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">آراء وتقييمات <span class="gradient-text">شركاء النجاح</span></h2>
-                <p class="text-gray-400">ثقة نخبة من المحاضرين، الأطباء، وأصحاب العلامات التجارية في مصر والعالم العربي</p>
+                <p class="text-theme-muted">ثقة نخبة من المحاضرين، الأطباء، وأصحاب العلامات التجارية في مصر والعالم العربي</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Client 1: Eng. Mohamed Zain -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شغل احترافي فوق الوصف في بناء الهوية البصرية الكاملة لبراند عسل زين، من تصميم الاستيكرز والموك أب لحد الإعلانات والريلز التجارية. عبد الرحمن فاهم يعني إيه يطلع المنتج بشكل فخم يبيع من أول نظرة."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">م. محمد زين</h4>
-                        <span class="text-xs text-brand">مؤسس علامة عسل وتمور زين (Zain Honey & Dates)</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">م. محمد زين</h4>
+                        <span class="text-xs text-brand font-semibold">مؤسس علامة عسل وتمور زين (Zain Honey & Dates)</span>
                     </div>
                 </div>
 
                 <!-- Client 2: Dr. Murtadha Al-Salami -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "إبداع حقيقي في إخراج الهوية البصرية والفيديوهات الخاصة بمنصة أثر (Athar) الطبية. دمج الموشن جرافيك مع الـ 3D والـ AI نقل شكل المنصة لمستوى عالمي ومميز جداً في العراق."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">د. مرتضى السلامي</h4>
-                        <span class="text-xs text-brand">منصة أثر الطبية — العراق 🇮🇶</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">د. مرتضى السلامي</h4>
+                        <span class="text-xs text-brand font-semibold">منصة أثر الطبية — العراق 🇮🇶</span>
                     </div>
                 </div>
 
                 <!-- Client 3: Mr. Mohamed Sharaf -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شريك النجاح في مشروع (مصطبة التاريخ). عبد الرحمن مش مجرد مونتير، هو مخرج فاهم روح المادة العلمية وبيحول المحاضرات والبروموهات لعمل سينمائي وتصميمات بتشد الطالب من أول ثانية."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">أ. محمد شرف</h4>
-                        <span class="text-xs text-brand">مؤسس مشروع مصطبة التاريخ</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">أ. محمد شرف</h4>
+                        <span class="text-xs text-brand font-semibold">مؤسس مشروع مصطبة التاريخ</span>
                     </div>
                 </div>
 
                 <!-- Client 4: Mr. Belal El-Shaer -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "تغطية وتصوير السنتر مع المونتاج السريع والاحترافي فرقوا جداً في إبراز تفاعل الطلاب وقوة الشرح. كواليتي الكاميرا والإضاءة وتقطيع الريلز دايماً في الموعد وبأعلى جودة."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">أ. بلال الشاعر</h4>
-                        <span class="text-xs text-brand">محاضر المرحلة الثانوية — تصوير ومونتاج السنتر</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">أ. بلال الشاعر</h4>
+                        <span class="text-xs text-brand font-semibold">محاضر المرحلة الثانوية — تصوير ومونتاج السنتر</span>
                     </div>
                 </div>
 
                 <!-- Client 5: Mr. Ahmed El-Falala -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "إعلان حجز الدروس في بداية السنة كان ضربة معلم! الفكرة وتنفيذ الفيديو خطفوا انتباه الطلاب وأولياء الأمور وحققوا تفاعل وحجوزات ممتازة من أول يوم نشر."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">أ. أحمد الفلالة</h4>
-                        <span class="text-xs text-brand">خبير اللغة الإنجليزية — حملة حجز بداية العام</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">أ. أحمد الفلالة</h4>
+                        <span class="text-xs text-brand font-semibold">خبير اللغة الإنجليزية — حملة حجز بداية العام</span>
                     </div>
                 </div>
 
                 <!-- Client 6: Mr. El-Saeedy -->
                 <div class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شغل جبار في حملة الانطلاقة الجديدة للعام الدراسي 2026، سواء في تصوير السنتر أو إعلانات المنصة أونلاين. الفيديو عكس قوة النظام الجديد ووصل الرسالة للطلبة بأقوى شكل بصري."
                     </p>
-                    <div class="border-t border-white/10 pt-4">
-                        <h4 class="font-bold text-white">الأستاذ الصعيدي</h4>
-                        <span class="text-xs text-brand">حملة البداية الجديدة 2026 (سنتر & أونلاين)</span>
+                    <div class="border-t border-brand/20 pt-4">
+                        <h4 class="font-bold">الأستاذ الصعيدي</h4>
+                        <span class="text-xs text-brand font-semibold">حملة البداية الجديدة 2026 (سنتر & أونلاين)</span>
                     </div>
                 </div>
             </div>
@@ -213,36 +440,36 @@
         <div class="max-w-4xl mx-auto glass rounded-3xl p-8 md:p-12">
             <div class="text-center mb-10">
                 <h2 class="text-3xl md:text-4xl font-black mb-3">Ready to Start Your <span class="gradient-text">Next Project?</span></h2>
-                <p class="text-gray-400">Send your project details directly via WhatsApp or connect on social media</p>
+                <p class="text-theme-muted">Send your project details directly via WhatsApp or connect on social media</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                <a href="https://wa.me/201020361366" target="_blank" class="glass p-5 rounded-2xl text-center glow-hover transition">
+                <a href="https://wa.me/201020361366" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
                     <div class="text-brand font-black text-lg mb-1">WhatsApp</div>
-                    <div class="text-sm text-gray-300">01020361366</div>
+                    <div class="text-sm text-theme-muted font-semibold">01020361366</div>
                 </a>
-                <a href="https://instagram.com/abdosaleh_17" target="_blank" class="glass p-5 rounded-2xl text-center glow-hover transition">
+                <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
                     <div class="text-brand font-black text-lg mb-1">Instagram</div>
-                    <div class="text-sm text-gray-300">@abdosaleh_17</div>
+                    <div class="text-sm text-theme-muted font-semibold">@abdosaleh_17</div>
                 </a>
-                <a href="mailto:abdomsaleh90@gmail.com" class="glass p-5 rounded-2xl text-center glow-hover transition">
+                <a href="mailto:abdomsaleh90@gmail.com" class="glass p-5 rounded-2xl text-center glow-hover transition block">
                     <div class="text-brand font-black text-lg mb-1">Email</div>
-                    <div class="text-sm text-gray-300">abdomsaleh90@gmail.com</div>
+                    <div class="text-sm text-theme-muted font-semibold">abdomsaleh90@gmail.com</div>
                 </a>
             </div>
 
             <!-- Direct WhatsApp Booking Form -->
             <form onsubmit="sendToWhatsApp(event)" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="clientName" required placeholder="Your Name / اسمك" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-brand focus:outline-none">
-                    <select id="projectType" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-brand focus:outline-none">
+                    <input type="text" id="clientName" required placeholder="Your Name / اسمك" class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none">
+                    <select id="projectType" class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none">
                         <option value="🎬 Commercial Video Edit">🎬 Commercial Video Edit</option>
                         <option value="⚡ AI Commercial / Visuals">⚡ AI Commercial / Visuals</option>
                         <option value="🖼️ Thumbnails & Social Posters">🖼️ Thumbnails & Social Posters</option>
                         <option value="📦 Full Campaign Package">📦 Full Campaign Package</option>
                     </select>
                 </div>
-                <textarea id="projectDetails" rows="4" required placeholder="Tell me about your project / تفاصيل المشروع المطلوب..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-brand focus:outline-none"></textarea>
+                <textarea id="projectDetails" rows="4" required placeholder="Tell me about your project / تفاصيل المشروع المطلوب..." class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none"></textarea>
                 <button type="submit" class="w-full bg-brand hover:bg-orange-600 text-white font-black py-4 rounded-xl transition shadow-lg text-lg">
                     Send Project Request via WhatsApp 🚀
                 </button>
@@ -250,11 +477,21 @@
         </div>
     </section>
 
-    <footer class="py-8 text-center text-xs text-gray-500 border-t border-white/5">
-        © 2026 Abdo Saleh (Jimmy). All Rights Reserved.
+    <!-- Footer -->
+    <footer class="py-8 text-center text-xs text-theme-muted border-t border-brand/15">
+        <p>© 2026 Abdo Saleh (Jimmy). All Rights Reserved.</p>
+        <div class="mt-2 flex justify-center gap-4">
+            <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="hover:text-brand font-semibold">Instagram</a>
+            <span>•</span>
+            <a href="https://wa.me/201020361366" target="_blank" rel="noopener noreferrer" class="hover:text-brand font-semibold">WhatsApp</a>
+            <span>•</span>
+            <a href="mailto:abdomsaleh90@gmail.com" class="hover:text-brand font-semibold">Gmail</a>
+        </div>
     </footer>
 
+    <!-- Interactive Scripts: WhatsApp, Morph Theme Toggle & 3D Smiley Cursor -->
     <script>
+        // 1. WhatsApp Direct Form Handler
         function sendToWhatsApp(e) {
             e.preventDefault();
             const name = document.getElementById('clientName').value;
@@ -263,6 +500,130 @@
             const msg = `مرحباً عبد الرحمن، أنا ${name}%0Aنوع المشروع: ${type}%0Aالتفاصيل: ${details}`;
             window.open(`https://wa.me/201020361366?text=${msg}`, '_blank');
         }
+
+        // 2. Smooth Morph Dark / Light Theme Switcher
+        const htmlEl = document.documentElement;
+        const morphCircle = document.getElementById('theme-morph-circle');
+
+        // Load saved user preference
+        if (localStorage.getItem('abdo_theme') === 'light') {
+            htmlEl.classList.remove('dark');
+        }
+
+        function toggleTheme(e) {
+            const isDark = htmlEl.classList.contains('dark');
+            const x = e ? e.clientX : window.innerWidth - 60;
+            const y = e ? e.clientY : 40;
+
+            // Set ripple color to target theme background
+            morphCircle.style.backgroundColor = isDark ? '#F8F6F2' : '#121212';
+            morphCircle.style.transition = 'none';
+            morphCircle.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+
+            // Trigger reflow & expand morph circle
+            requestAnimationFrame(() => {
+                morphCircle.style.transition = 'clip-path 0.65s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s ease';
+                morphCircle.style.opacity = '0.35';
+                morphCircle.style.clipPath = `circle(150vmax at ${x}px ${y}px)`;
+
+                // Toggle actual theme classes & CSS variables
+                htmlEl.classList.toggle('dark');
+                localStorage.setItem('abdo_theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+
+                setTimeout(() => {
+                    morphCircle.style.opacity = '0';
+                    setTimeout(() => {
+                        morphCircle.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+                    }, 350);
+                }, 400);
+            });
+        }
+
+        // 3. 3D Interactive Cartoon Smiley Cursor Engine
+        const cursor = document.getElementById('smiley-cursor');
+        const eyesOpen = document.getElementById('eyes-open');
+        const eyesBlink = document.getElementById('eyes-blink');
+        const mouthSmile = document.getElementById('mouth-smile');
+        const mouthLaugh = document.getElementById('mouth-laugh');
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let posX = mouseX;
+        let posY = mouseY;
+        let isHovering = false;
+        let moveTimeout;
+
+        window.addEventListener('mousemove', (e) => {
+            const dx = e.clientX - mouseX;
+            const dy = e.clientY - mouseY;
+            const speed = Math.hypot(dx, dy);
+
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Laugh dynamically when moving fast
+            if (speed > 18 && !isHovering) {
+                mouthSmile.style.display = 'none';
+                mouthLaugh.style.display = 'block';
+                clearTimeout(moveTimeout);
+                moveTimeout = setTimeout(() => {
+                    if (!isHovering) {
+                        mouthSmile.style.display = 'block';
+                        mouthLaugh.style.display = 'none';
+                    }
+                }, 220);
+            }
+        });
+
+        // Smooth Spring Physics Loop (60fps)
+        function animateCursor() {
+            const vx = (mouseX - posX) * 0.22;
+            const vy = (mouseY - posY) * 0.22;
+            posX += vx;
+            posY += vy;
+
+            // Subtle 3D tilt based on velocity
+            const tilt = Math.max(-22, Math.min(22, vx * 1.4));
+            cursor.style.transform = `translate3d(${posX}px, ${posY}px, 0) translate(-50%, -50%) rotate(${tilt}deg)`;
+
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Click Interaction: Blink / Squish
+        window.addEventListener('mousedown', () => {
+            cursor.classList.add('cursor-click');
+            eyesOpen.style.display = 'none';
+            eyesBlink.style.display = 'block';
+            mouthSmile.style.display = 'none';
+            mouthLaugh.style.display = 'block';
+        });
+
+        window.addEventListener('mouseup', () => {
+            cursor.classList.remove('cursor-click');
+            eyesOpen.style.display = 'block';
+            eyesBlink.style.display = 'none';
+            if (!isHovering) {
+                mouthSmile.style.display = 'block';
+                mouthLaugh.style.display = 'none';
+            }
+        });
+
+        // Hover Interaction on Links & Buttons: Big Laugh
+        document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                isHovering = true;
+                cursor.classList.add('cursor-hover');
+                mouthSmile.style.display = 'none';
+                mouthLaugh.style.display = 'block';
+            });
+            el.addEventListener('mouseleave', () => {
+                isHovering = false;
+                cursor.classList.remove('cursor-hover');
+                mouthSmile.style.display = 'block';
+                mouthLaugh.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
