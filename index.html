@@ -57,6 +57,7 @@
             color: var(--text-main);
             transition: background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1), color 0.65s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-x: hidden;
+            cursor: default;
         }
 
         /* 1. 3D SLICED WAVE BACKGROUND (30% WIDTH, SCROLL-REACTIVE) */
@@ -127,6 +128,181 @@
             animation: diamondFloat 3.2s ease-in-out infinite;
         }
 
+        /* =========================================================================
+           TIMELINE BUILD ENGINE (Fast Start -> Smooth Deceleration -> Fade to UI)
+           ========================================================================= */
+        [data-tl-build] {
+            position: relative;
+        }
+
+        /* Actual UI content starts hidden and transitions in smoothly as timeline fades out */
+        .tl-content-hidden {
+            opacity: 0;
+            transform: translateY(10px) scale(0.985);
+            filter: blur(6px);
+        }
+
+        @keyframes uiRevealFromTimeline {
+            0% {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+                filter: blur(8px);
+            }
+            45% {
+                opacity: 0.15;
+                transform: translateY(6px) scale(0.99);
+                filter: blur(4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+            }
+        }
+
+        .tl-content-revealing {
+            animation: uiRevealFromTimeline 1.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .tl-content-done {
+            opacity: 1 !important;
+            transform: none;
+            filter: none;
+        }
+
+        /* Overlay holding the colorful Timeline Tracks that rush in from Left & Right */
+        .tl-builder-overlay {
+            position: absolute;
+            inset: -4px;
+            z-index: 60;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 7px;
+            padding: 10px 14px;
+            background: rgba(18, 18, 20, 0.45);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(220, 86, 33, 0.35);
+            animation: tlOverlayFadeOut 1.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        html:not(.dark) .tl-builder-overlay {
+            background: rgba(248, 246, 242, 0.65);
+        }
+
+        @keyframes tlOverlayFadeOut {
+            0% { opacity: 1; }
+            62% { opacity: 0.95; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        /* Timeline Track Row */
+        .tl-track-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            height: 16px;
+            will-change: transform, opacity;
+        }
+
+        /* Tracks sliding from LEFT (Fast initial burst -> smooth slow down -> fade) */
+        @keyframes slideInFromLeft {
+            0% {
+                transform: translate3d(-105%, 0, 0) scaleX(1.15);
+                opacity: 0;
+            }
+            18% {
+                opacity: 1;
+            }
+            68% {
+                transform: translate3d(0%, 0, 0) scaleX(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate3d(2%, 0, 0) scaleX(0.98);
+                opacity: 0;
+            }
+        }
+
+        /* Tracks sliding from RIGHT (Fast initial burst -> smooth slow down -> fade) */
+        @keyframes slideInFromRight {
+            0% {
+                transform: translate3d(105%, 0, 0) scaleX(1.15);
+                opacity: 0;
+            }
+            18% {
+                opacity: 1;
+            }
+            68% {
+                transform: translate3d(0%, 0, 0) scaleX(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate3d(-2%, 0, 0) scaleX(0.98);
+                opacity: 0;
+            }
+        }
+
+        .tl-from-left {
+            animation: slideInFromLeft 1.4s cubic-bezier(0.12, 0.98, 0.24, 1) forwards;
+        }
+
+        .tl-from-right {
+            animation: slideInFromRight 1.4s cubic-bezier(0.12, 0.98, 0.24, 1) forwards;
+        }
+
+        /* Individual NLE Colored Clip Block */
+        .tl-clip-block {
+            height: 100%;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Glowing Playhead Sweep Line inside each building element */
+        @keyframes playheadSweep {
+            0% { left: 0%; opacity: 0; }
+            15% { opacity: 1; }
+            75% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        .tl-sweep-playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #FFFFFF;
+            box-shadow: 0 0 12px #FFFFFF, 0 0 20px #DC5621;
+            z-index: 70;
+            animation: playheadSweep 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .tl-sweep-playhead::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            background: #DC5621;
+            transform: rotate(45deg);
+            border-radius: 2px;
+        }
+
         /* 2. HERO NLE TIMELINE UI */
         .nle-timeline-box {
             position: relative;
@@ -179,156 +355,6 @@
             transform-origin: center;
         }
 
-        /* AFTER EFFECTS SWARM REBUILD ENGINE (1.5s SMOOTH KEYFRAMES) */
-        [data-swarm] {
-            opacity: 0;
-            will-change: transform, opacity, filter;
-        }
-
-        @keyframes aeSwarmConstruct {
-            0% {
-                opacity: 0;
-                transform: translate3d(var(--sx, 0px), var(--sy, 28px), 0) scale(0.86);
-                filter: blur(8px);
-            }
-            28% {
-                opacity: 0.85;
-                filter: blur(1.5px);
-            }
-            72% {
-                opacity: 1;
-                transform: translate3d(calc(var(--sx, 0px) * -0.04), -2px, 0) scale(1.015);
-                filter: blur(0px);
-            }
-            100% {
-                opacity: 1;
-                transform: translate3d(0, 0, 0) scale(1);
-                filter: blur(0px);
-            }
-        }
-
-        .swarm-building {
-            animation: aeSwarmConstruct 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            position: relative;
-        }
-
-        .swarm-done {
-            opacity: 1 !important;
-            transform: none;
-            filter: none;
-        }
-
-        .swarm-box-overlay {
-            position: absolute;
-            inset: -5px;
-            border: 1.5px solid var(--swarm-color, #3B82F6);
-            background: rgba(59, 130, 246, 0.04);
-            pointer-events: none;
-            z-index: 45;
-            border-radius: 6px;
-            animation: boxFadeOut 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes boxFadeOut {
-            0% { opacity: 0; transform: scale(0.92); }
-            20% { opacity: 1; transform: scale(1); }
-            78% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .swarm-handle {
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            background: #FFFFFF;
-            border: 1.5px solid var(--swarm-color, #3B82F6);
-            border-radius: 1.5px;
-        }
-        .sh-tl { top: -4px; left: -4px; }
-        .sh-tr { top: -4px; right: -4px; }
-        .sh-bl { bottom: -4px; left: -4px; }
-        .sh-br { bottom: -4px; right: -4px; }
-        .sh-tm { top: -4px; left: calc(50% - 3.5px); }
-        .sh-bm { bottom: -4px; left: calc(50% - 3.5px); }
-        .sh-ml { top: calc(50% - 3.5px); left: -4px; }
-        .sh-mr { top: calc(50% - 3.5px); right: -4px; }
-
-        .swarm-dim-tag {
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--swarm-color, #3B82F6);
-            color: #fff;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 5px;
-            border-radius: 3px;
-            white-space: nowrap;
-            font-family: monospace;
-            letter-spacing: 0.3px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-        }
-
-        #swarm-stage {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9990;
-            overflow: hidden;
-        }
-
-        .swarm-agent {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            will-change: transform, opacity;
-            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-            opacity: 0;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
-        }
-
-        .swarm-agent-label {
-            position: absolute;
-            left: 16px;
-            top: 14px;
-            padding: 2px 7px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            color: #FFFFFF;
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        #swarm-snap-line-v, #swarm-snap-line-h {
-            position: fixed;
-            background: rgba(244, 63, 94, 0.65);
-            pointer-events: none;
-            z-index: 9985;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #swarm-snap-line-v { top: 0; bottom: 0; width: 1px; left: 50%; box-shadow: 0 0 8px rgba(244, 63, 94, 0.8); }
-        #swarm-snap-line-h { left: 0; right: 0; height: 1px; top: 50%; box-shadow: 0 0 8px rgba(244, 63, 94, 0.8); }
-
-        #swarm-hud {
-            position: fixed;
-            bottom: 22px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            z-index: 9995;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #swarm-hud.hud-active {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
         /* 3D PORTFOLIO CARDS + AMBIENT GLOW + FADE */
         .portfolio-grid { perspective: 1400px; }
 
@@ -345,9 +371,9 @@
             0%, 100% { transform: translateY(0px) rotateX(2deg) rotateY(-2deg); }
             50% { transform: translateY(-7px) rotateX(-2deg) rotateY(2deg); }
         }
-        .card-3d-wrapper.swarm-done:nth-child(1) { animation: idleFloat 5s ease-in-out infinite; }
-        .card-3d-wrapper.swarm-done:nth-child(2) { animation: idleFloat 5.6s ease-in-out infinite 0.6s; }
-        .card-3d-wrapper.swarm-done:nth-child(3) { animation: idleFloat 6.2s ease-in-out infinite 1.2s; }
+        .card-3d-wrapper.tl-content-done:nth-child(1) { animation: idleFloat 5s ease-in-out infinite; }
+        .card-3d-wrapper.tl-content-done:nth-child(2) { animation: idleFloat 5.6s ease-in-out infinite 0.6s; }
+        .card-3d-wrapper.tl-content-done:nth-child(3) { animation: idleFloat 6.2s ease-in-out infinite 1.2s; }
 
         .portfolio-grid:hover .card-3d-wrapper { animation-play-state: paused; }
 
@@ -420,42 +446,6 @@
         html.dark .moon-svg { transform: rotate(-120deg) scale(0); opacity: 0; }
         html:not(.dark) .sun-svg { transform: rotate(120deg) scale(0); opacity: 0; }
         html:not(.dark) .moon-svg { transform: rotate(0deg) scale(1); opacity: 1; }
-
-        /* =========================================================
-           ULTRA-FAST 1:1 ZERO-LATENCY 3D SMILEY CURSOR
-           ========================================================= */
-        @media (pointer: fine) {
-            body, a, button, input, select, textarea { cursor: none !important; }
-        }
-        @media (pointer: coarse) {
-            #smiley-cursor { display: none !important; }
-        }
-
-        #smiley-cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 32px;
-            height: 32px;
-            pointer-events: none;
-            z-index: 99999;
-            /* No CSS transition on transform so movement is 100% instant with mouse! */
-            will-change: transform;
-        }
-
-        #smiley-cursor-inner {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.12s ease-out;
-        }
-
-        #smiley-cursor.cursor-hover #smiley-cursor-inner {
-            transform: scale(1.28);
-        }
-
-        #smiley-cursor.cursor-click #smiley-cursor-inner {
-            transform: scale(0.84);
-        }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-brand selection:text-white">
@@ -466,61 +456,9 @@
     <!-- Morphing Theme Overlay -->
     <div id="theme-morph-circle"></div>
 
-    <!-- Swarm Rebuild Stage -->
-    <div id="swarm-snap-line-v"></div>
-    <div id="swarm-snap-line-h"></div>
-    <div id="swarm-stage"></div>
-
-    <!-- Bottom Swarm HUD Pill -->
-    <div id="swarm-hud" class="glass px-4 py-2 rounded-full flex items-center gap-2.5 border border-brand/40 shadow-2xl">
-        <span class="flex gap-1">
-            <span class="w-2 h-2 rounded-full bg-brand animate-ping"></span>
-            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        </span>
-        <span id="swarm-hud-text" class="text-[11px] font-extrabold tracking-wide uppercase">Swarm Agents Building UI • 1.5s</span>
-    </div>
-
-    <!-- Lightweight Instant 3D Smiley Cursor (Zero Lag) -->
-    <div id="smiley-cursor">
-        <div id="smiley-cursor-inner">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <radialGradient id="sphere3D" cx="32%" cy="28%" r="70%">
-                        <stop offset="0%" stop-color="#FFE066"/>
-                        <stop offset="50%" stop-color="#FF922B"/>
-                        <stop offset="100%" stop-color="#DC5621"/>
-                    </radialGradient>
-                </defs>
-                <!-- Clean lightweight 3D sphere -->
-                <circle cx="50" cy="50" r="46" fill="url(#sphere3D)" stroke="#FFFFFF" stroke-width="3" stroke-opacity="0.6"/>
-                <ellipse cx="34" cy="26" rx="14" ry="7" transform="rotate(-25 34 26)" fill="#FFFFFF" fill-opacity="0.45"/>
-                <!-- Eyes Open -->
-                <g id="eyes-open">
-                    <circle cx="35" cy="43" r="6" fill="#121212"/>
-                    <circle cx="33" cy="41" r="2" fill="#FFFFFF"/>
-                    <circle cx="65" cy="43" r="6" fill="#121212"/>
-                    <circle cx="63" cy="41" r="2" fill="#FFFFFF"/>
-                </g>
-                <!-- Eyes Blink (On Click) -->
-                <g id="eyes-blink" style="display: none;">
-                    <path d="M 27 43 Q 35 35 43 43" stroke="#121212" stroke-width="5" stroke-linecap="round" fill="none"/>
-                    <path d="M 57 43 Q 65 35 73 43" stroke="#121212" stroke-width="5" stroke-linecap="round" fill="none"/>
-                </g>
-                <!-- Default Smile -->
-                <path id="mouth-smile" d="M 32 60 Q 50 75 68 60" stroke="#121212" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-                <!-- Hover / Click Laugh -->
-                <g id="mouth-laugh" style="display: none;">
-                    <path d="M 29 57 Q 50 82 71 57 Z" fill="#121212"/>
-                    <path d="M 38 67 Q 50 75 62 67 Z" fill="#FF4D4D"/>
-                </g>
-            </svg>
-        </div>
-    </div>
-
     <!-- Navbar -->
-    <header class="fixed top-0 w-full z-50 px-4 py-4" data-swarm-group="hero">
-        <div data-swarm class="max-w-6xl mx-auto glass rounded-2xl px-6 py-3 flex items-center justify-between">
+    <header class="fixed top-0 w-full z-50 px-4 py-4" data-tl-group="hero">
+        <div data-tl-build class="max-w-6xl mx-auto glass rounded-2xl px-6 py-3 flex items-center justify-between">
             <a href="#" class="text-xl font-black tracking-tight">ABDO <span class="text-brand">SALEH</span></a>
             
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-theme-muted">
@@ -532,12 +470,12 @@
             </nav>
 
             <div class="flex items-center gap-2.5">
-                <button onclick="replayVisibleSwarm()" class="glass px-3 py-2 rounded-xl text-xs font-bold hover:border-brand transition flex items-center gap-1.5" title="Replay 1.5s Swarm Animation">
-                    <span class="text-brand">⚡</span>
-                    <span class="hidden sm:inline">Swarm</span>
+                <button onclick="replayVisibleTimelineBuild()" class="glass px-3 py-2 rounded-xl text-xs font-bold hover:border-brand transition flex items-center gap-1.5 cursor-pointer" title="Replay 1.5s Timeline Build">
+                    <span class="text-brand">▶</span>
+                    <span class="hidden sm:inline">Timeline Build</span>
                 </button>
 
-                <button id="theme-toggle" onclick="toggleTheme(event)" aria-label="Toggle Theme" class="glass p-2.5 rounded-xl hover:border-brand transition flex items-center justify-center" title="Switch Light / Dark Mode">
+                <button id="theme-toggle" onclick="toggleTheme(event)" aria-label="Toggle Theme" class="glass p-2.5 rounded-xl hover:border-brand transition flex items-center justify-center cursor-pointer" title="Switch Light / Dark Mode">
                     <div class="theme-icon-wrapper">
                         <svg class="sun-svg text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
@@ -564,16 +502,16 @@
     </header>
 
     <!-- Hero Section + Interactive Video Editor Timeline -->
-    <section class="pt-36 pb-16 px-4 text-center relative overflow-hidden" data-swarm-group="hero">
+    <section class="pt-36 pb-16 px-4 text-center relative overflow-hidden" data-tl-group="hero">
         <div class="max-w-4xl mx-auto">
-            <div data-swarm class="inline-block mb-6">
+            <div data-tl-build class="inline-block mb-6">
                 <span class="inline-block px-4 py-1.5 rounded-full glass text-brand text-xs font-bold uppercase tracking-widest">
                     Video Editor • Videographer • AI Visual Director
                 </span>
             </div>
             
             <!-- Hero Headline: 🔸 Editing how people feel. -->
-            <h1 data-swarm class="text-4xl md:text-7xl font-black leading-tight mb-6 flex items-center justify-center flex-wrap gap-3 md:gap-4 tracking-tight">
+            <h1 data-tl-build class="text-4xl md:text-7xl font-black leading-tight mb-6 flex items-center justify-center flex-wrap gap-3 md:gap-4 tracking-tight">
                 <span class="diamond-3d" aria-hidden="true">
                     <svg class="w-9 h-9 md:w-14 md:h-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -594,11 +532,11 @@
                 <span>Editing <span class="gradient-text">how people feel.</span></span>
             </h1>
 
-            <p data-swarm class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
+            <p data-tl-build class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
                 Transforming ideas into cinematic stories, viral educational promos, and next-gen AI commercials for top instructors and brands across Egypt & the MENA region.
             </p>
 
-            <div data-swarm class="flex flex-wrap justify-center gap-4 mb-14">
+            <div data-tl-build class="flex flex-wrap justify-center gap-4 mb-14">
                 <a href="#portfolio" class="bg-brand hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg">
                     Explore My Work
                 </a>
@@ -608,7 +546,7 @@
             </div>
 
             <!-- INTERACTIVE NLE VIDEO EDITOR TIMELINE SHOWCASE -->
-            <div data-swarm id="hero-nle-timeline" class="nle-timeline-box glass rounded-3xl p-5 md:p-7 max-w-3xl mx-auto text-left shadow-2xl">
+            <div data-tl-build id="hero-nle-timeline" class="nle-timeline-box glass rounded-3xl p-5 md:p-7 max-w-3xl mx-auto text-left shadow-2xl">
                 <div class="flex items-center justify-between border-b border-brand/20 pb-3 mb-4 text-xs font-mono">
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-brand animate-pulse"></span>
@@ -680,16 +618,16 @@
     </section>
 
     <!-- Portfolio Categories Section -->
-    <section id="portfolio" class="py-20 px-4" data-swarm-group="portfolio">
+    <section id="portfolio" class="py-20 px-4" data-tl-group="portfolio">
         <div class="max-w-6xl mx-auto">
-            <div data-swarm class="text-center mb-16">
+            <div data-tl-build class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">Featured <span class="gradient-text">Portfolio</span></h2>
                 <p class="text-theme-muted">Hover to inspect in 3D • Click any card to explore full projects on Google Drive</p>
             </div>
 
             <div class="portfolio-grid grid grid-cols-1 md:grid-cols-3 gap-10">
                 <!-- Card 1: Commercial Edits -->
-                <div data-swarm class="card-3d-wrapper">
+                <div data-tl-build class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1vB8Ii4RROFm3mtAcQOpeEPGvkdO3GWp9" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -708,7 +646,7 @@
                 </div>
 
                 <!-- Card 2: AI Commercials -->
-                <div data-swarm class="card-3d-wrapper">
+                <div data-tl-build class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1zTOmqPmZyX603gBBqxJ2WwJpB4uAv5A7?usp=drive_link" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -727,7 +665,7 @@
                 </div>
 
                 <!-- Card 3: Thumbnails & Posters -->
-                <div data-swarm class="card-3d-wrapper">
+                <div data-tl-build class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1kiEmzAFCUC1QALm0EoUC6gb92srLGpzH?usp=sharing" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -749,9 +687,9 @@
     </section>
 
     <!-- EXPERIENCE, AI WORKFLOW & SOFTWARE CUPS SECTION -->
-    <section id="experience" class="py-20 px-4 sec-bg" dir="rtl" data-swarm-group="experience">
+    <section id="experience" class="py-20 px-4 sec-bg" dir="rtl" data-tl-group="experience">
         <div class="max-w-6xl mx-auto font-arabic">
-            <div data-swarm class="text-center mb-16">
+            <div data-tl-build class="text-center mb-16">
                 <span class="inline-block px-4 py-1 rounded-full glass text-brand text-xs font-bold mb-3">
                     EXPERIENCE & WORKFLOW
                 </span>
@@ -760,7 +698,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">🎬</div>
                     <h3 class="text-xl font-black mb-2">خبرة سنتين في الـ Video Editing</h3>
                     <p class="text-theme-muted text-sm leading-relaxed">
@@ -768,7 +706,7 @@
                     </p>
                 </div>
 
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">🎥</div>
                     <h3 class="text-xl font-black mb-2">Videographer & Storytelling</h3>
                     <p class="text-theme-muted text-sm leading-relaxed">
@@ -776,7 +714,7 @@
                     </p>
                 </div>
 
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition md:col-span-2 lg:col-span-1">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition md:col-span-2 lg:col-span-1">
                     <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">⚡</div>
                     <h3 class="text-xl font-black mb-2">AI Workflow & Fast Plugins</h3>
                     <p class="text-theme-muted text-sm leading-relaxed">
@@ -786,7 +724,7 @@
             </div>
 
             <!-- Software Mastery Cups -->
-            <div data-swarm class="glass rounded-3xl p-8 md:p-12" dir="ltr">
+            <div data-tl-build class="glass rounded-3xl p-8 md:p-12" dir="ltr">
                 <div class="text-center mb-12 font-arabic" dir="rtl">
                     <h3 class="text-2xl md:text-4xl font-black mb-2">إجادة البرامج <span class="gradient-text">(Software Mastery Cups)</span></h3>
                     <p class="text-theme-muted text-sm">كل كوب يعبر عن نسبة إجادتي للبرنامج، ومغطى بشريط Timeline من Premiere Pro بألوان الهوية</p>
@@ -920,15 +858,15 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-20 px-4" dir="rtl" data-swarm-group="testimonials">
+    <section id="testimonials" class="py-20 px-4" dir="rtl" data-tl-group="testimonials">
         <div class="max-w-6xl mx-auto font-arabic">
-            <div data-swarm class="text-center mb-14">
+            <div data-tl-build class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">آراء وتقييمات <span class="gradient-text">شركاء النجاح</span></h2>
                 <p class="text-theme-muted">ثقة نخبة من المحاضرين، الأطباء، وأصحاب العلامات التجارية في مصر والعالم العربي</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شغل احترافي فوق الوصف في بناء الهوية البصرية الكاملة لبراند عسل زين، من تصميم الاستيكرز والموك أب لحد الإعلانات والريلز التجارية. عبد الرحمن فاهم يعني إيه يطلع المنتج بشكل فخم يبيع من أول نظرة."
@@ -939,7 +877,7 @@
                     </div>
                 </div>
 
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "إبداع حقيقي في إخراج الهوية البصرية والفيديوهات الخاصة بمنصة أثر (Athar) الطبية. دمج الموشن جرافيك مع الـ 3D والـ AI نقل شكل المنصة لمستوى عالمي ومميز جداً في العراق."
@@ -950,488 +888,8 @@
                     </div>
                 </div>
 
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-tl-build class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شريك النجاح في مشروع (مصطبة التاريخ). عبد الرحمن مش مجرد مونتير، هو مخرج فاهم روح المادة العلمية وبيحول المحاضرات والبروموهات لعمل سينمائي وتصميمات بتشد الطالب من أول ثانية."
-                    </p>
-                    <div class="border-t border-brand/20 pt-4">
-                        <h4 class="font-bold">أ. محمد شرف</h4>
-                        <span class="text-xs text-brand font-semibold">مؤسس مشروع مصطبة التاريخ</span>
-                    </div>
-                </div>
-
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
-                    <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
-                        "تغطية وتصوير السنتر مع المونتاج السريع والاحترافي فرقوا جداً في إبراز تفاعل الطلاب وقوة الشرح. كواليتي الكاميرا والإضاءة وتقطيع الريلز دايماً في الموعد وبأعلى جودة."
-                    </p>
-                    <div class="border-t border-brand/20 pt-4">
-                        <h4 class="font-bold">أ. بلال الشاعر</h4>
-                        <span class="text-xs text-brand font-semibold">محاضر المرحلة الثانوية — تصوير ومونتاج السنتر</span>
-                    </div>
-                </div>
-
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
-                    <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
-                        "إعلان حجز الدروس في بداية السنة كان ضربة معلم! الفكرة وتنفيذ الفيديو خطفوا انتباه الطلاب وأولياء الأمور وحققوا تفاعل وحجوزات ممتازة من أول يوم نشر."
-                    </p>
-                    <div class="border-t border-brand/20 pt-4">
-                        <h4 class="font-bold">أ. أحمد الفلالة</h4>
-                        <span class="text-xs text-brand font-semibold">خبير اللغة الإنجليزية — حملة حجز بداية العام</span>
-                    </div>
-                </div>
-
-                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
-                    <div class="text-brand text-xl mb-3">★★★★★</div>
-                    <p class="text-theme-muted text-sm leading-relaxed mb-6">
-                        "شغل جبار في حملة الانطلاقة الجديدة للعام الدراسي 2026، سواء في تصوير السنتر أو إعلانات المنصة أونلاين. الفيديو عكس قوة النظام الجديد ووصل الرسالة للطلبة بأقوى شكل بصري."
-                    </p>
-                    <div class="border-t border-brand/20 pt-4">
-                        <h4 class="font-bold">الأستاذ الصعيدي</h4>
-                        <span class="text-xs text-brand font-semibold">حملة البداية الجديدة 2026 (سنتر & أونلاين)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact & Booking Section -->
-    <section id="contact" class="py-20 px-4 sec-bg" data-swarm-group="contact">
-        <div data-swarm class="max-w-4xl mx-auto glass rounded-3xl p-8 md:p-12">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl md:text-4xl font-black mb-3">Ready to Start Your <span class="gradient-text">Next Project?</span></h2>
-                <p class="text-theme-muted">Send your project details directly via WhatsApp, Instagram, or Gmail Inbox</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                <a href="https://wa.me/201552757725" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
-                    <div class="text-brand font-black text-lg mb-1">WhatsApp</div>
-                    <div class="text-sm text-theme-muted font-semibold">01552757725</div>
-                </a>
-                <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
-                    <div class="text-brand font-black text-lg mb-1">Instagram</div>
-                    <div class="text-sm text-theme-muted font-semibold">@abdosaleh_17</div>
-                </a>
-                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abdomsaleh90@gmail.com&su=Project%20Inquiry%20-%20Abdo%20Saleh" onclick="openGmailDirect(event)" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
-                    <div class="text-brand font-black text-lg mb-1">Gmail Inbox ✉️</div>
-                    <div class="text-sm text-theme-muted font-semibold">abdomsaleh90@gmail.com</div>
-                </a>
-            </div>
-
-            <form onsubmit="sendToWhatsApp(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="clientName" required placeholder="Your Name / اسمك" class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none">
-                    <select id="projectType" class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none">
-                        <option value="🎬 Commercial Video Edit">🎬 Commercial Video Edit</option>
-                        <option value="⚡ AI Commercial / Visuals">⚡ AI Commercial / Visuals</option>
-                        <option value="🖼️ Thumbnails & Social Posters">🖼️ Thumbnails & Social Posters</option>
-                        <option value="📦 Full Campaign Package">📦 Full Campaign Package</option>
-                    </select>
-                </div>
-                <textarea id="projectDetails" rows="4" required placeholder="Tell me about your project / تفاصيل المشروع المطلوب..." class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none"></textarea>
-                <button type="submit" class="w-full bg-brand hover:bg-orange-600 text-white font-black py-4 rounded-xl transition shadow-lg text-lg">
-                    Send Project Request via WhatsApp 🚀
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-8 text-center text-xs text-theme-muted border-t border-brand/15">
-        <p>© 2026 Abdo Saleh (Jimmy). All Rights Reserved.</p>
-        <div class="mt-2 flex justify-center gap-4">
-            <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="hover:text-brand font-semibold">Instagram</a>
-            <span>•</span>
-            <a href="https://wa.me/201552757725" target="_blank" rel="noopener noreferrer" class="hover:text-brand font-semibold">WhatsApp</a>
-            <span>•</span>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abdomsaleh90@gmail.com&su=Project%20Inquiry%20-%20Abdo%20Saleh" onclick="openGmailDirect(event)" target="_blank" rel="noopener noreferrer" class="hover:text-brand font-semibold">Gmail Inbox</a>
-        </div>
-    </footer>
-
-    <!-- Interactive Scripts -->
-    <script>
-        /* =========================================================================
-           1. 3D SLICED RIBBON WAVE ENGINE (30% Width, Moves with Scroll)
-           ========================================================================= */
-        const waveCanvas = document.getElementById('scroll-wave-canvas');
-        const ctx = waveCanvas.getContext('2d');
-        let targetScroll = 0;
-        let currentScroll = 0;
-        let timePhase = 0;
-
-        function resizeWaveCanvas() {
-            waveCanvas.width = waveCanvas.offsetWidth * window.devicePixelRatio;
-            waveCanvas.height = window.innerHeight * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-        }
-        window.addEventListener('resize', resizeWaveCanvas);
-        resizeWaveCanvas();
-
-        window.addEventListener('scroll', () => {
-            targetScroll = window.scrollY;
-        }, { passive: true });
-
-        function renderSlicedWave() {
-            currentScroll += (targetScroll - currentScroll) * 0.08;
-            timePhase += 0.015;
-
-            const w = waveCanvas.offsetWidth;
-            const h = window.innerHeight;
-            ctx.clearRect(0, 0, w, h);
-
-            const numSlices = 58;
-            const sliceSpacing = h / (numSlices - 6);
-            const scrollShift = currentScroll * 0.0045;
-
-            for (let i = 0; i < numSlices; i++) {
-                const y = (i - 3) * sliceSpacing;
-                const progress = i / numSlices;
-                const angle = progress * Math.PI * 2.4 - scrollShift + timePhase;
-
-                const waveCenterX = w * 0.56 + Math.sin(angle) * (w * 0.24);
-                const twist = Math.cos(angle);
-                const rx = Math.max(24, w * 0.28 * (0.65 + 0.35 * Math.sin(angle * 0.8)));
-                const ry = 14 + Math.abs(twist) * 20;
-                const tilt = twist * 0.55;
-
-                ctx.save();
-                ctx.translate(waveCenterX, y);
-                ctx.rotate(tilt);
-
-                const grad = ctx.createLinearGradient(-rx, -ry, rx, ry);
-                grad.addColorStop(0, '#2A0800');
-                grad.addColorStop(0.42, '#9A2B0B');
-                grad.addColorStop(0.76, '#DC5621');
-                grad.addColorStop(1, '#FF9E44');
-
-                ctx.beginPath();
-                ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-                ctx.fillStyle = grad;
-                ctx.fill();
-
-                ctx.lineWidth = 1.4;
-                ctx.strokeStyle = 'rgba(255, 195, 120, 0.55)';
-                ctx.stroke();
-                ctx.restore();
-            }
-
-            requestAnimationFrame(renderSlicedWave);
-        }
-        renderSlicedWave();
-
-        /* =========================================================================
-           2. HERO NLE TIMELINE INTERACTIVE PLAYHEAD SCRUBBER
-           ========================================================================= */
-        const nleBox = document.getElementById('hero-nle-timeline');
-        const playhead = document.getElementById('hero-playhead');
-        const timecodeEl = document.getElementById('nle-timecode');
-
-        if (nleBox && playhead && timecodeEl) {
-            nleBox.addEventListener('mousemove', (e) => {
-                const rect = nleBox.getBoundingClientRect();
-                const relX = Math.max(48, Math.min(rect.width - 24, e.clientX - rect.left));
-                const pct = (relX / rect.width) * 100;
-                playhead.style.left = `${pct}%`;
-
-                const totalFrames = Math.floor((pct / 100) * 12 * 24);
-                const secs = String(Math.floor(totalFrames / 24)).padStart(2, '0');
-                const frames = String(totalFrames % 24).padStart(2, '0');
-                timecodeEl.textContent = `00:00:${secs}:${frames}`;
-            }, { passive: true });
-        }
-
-        /* =========================================================================
-           3. AFTER EFFECTS SWARM REBUILD ENGINE (1.5s Smooth Keyframe Construction)
-           ========================================================================= */
-        const SWARM_AGENTS = [
-            { name: 'Director_AI', color: '#DC5621' },
-            { name: 'Motion_Key',  color: '#3B82F6' },
-            { name: 'VFX_Node',    color: '#10B981' },
-            { name: 'Color_Lab',   color: '#A855F7' },
-            { name: 'Jimmy_3D',    color: '#F59E0B' },
-            { name: 'Edit_Pro',    color: '#EC4899' }
-        ];
-
-        const swarmStage = document.getElementById('swarm-stage');
-        const snapLineV = document.getElementById('swarm-snap-line-v');
-        const snapLineH = document.getElementById('swarm-snap-line-h');
-        const swarmHud = document.getElementById('swarm-hud');
-        let agentNodes = [];
-        let hudTimeout;
-
-        function initSwarmAgents() {
-            swarmStage.innerHTML = '';
-            agentNodes = SWARM_AGENTS.map(agent => {
-                const el = document.createElement('div');
-                el.className = 'swarm-agent';
-                el.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M3 3L10.5 20.5L13.5 13.5L20.5 10.5L3 3Z" fill="${agent.color}" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
-                    </svg>
-                    <span class="swarm-agent-label" style="background:${agent.color}">${agent.name}</span>
-                `;
-                const startX = Math.random() * window.innerWidth;
-                const startY = Math.random() * window.innerHeight;
-                el.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
-                swarmStage.appendChild(el);
-                return { el, ...agent };
-            });
-        }
-        initSwarmAgents();
-
-        function runSwarmOnElements(elements) {
-            if (!elements || elements.length === 0) return;
-
-            swarmHud.classList.add('hud-active');
-            snapLineV.style.opacity = '0.55';
-            snapLineH.style.opacity = '0.4';
-            clearTimeout(hudTimeout);
-
-            const totalDuration = 1500;
-            const count = elements.length;
-            const maxStagger = Math.min(360, count * 65);
-
-            agentNodes.forEach(a => { a.el.style.opacity = '1'; });
-
-            elements.forEach((el, idx) => {
-                const agent = agentNodes[idx % agentNodes.length];
-                const delay = count > 1 ? (idx / (count - 1)) * maxStagger : 0;
-
-                el.classList.remove('swarm-building', 'swarm-done');
-                el.style.opacity = '0';
-
-                const offsetX = (idx % 2 === 0 ? -1 : 1) * (18 + (idx % 3) * 8);
-                const offsetY = 24;
-                el.style.setProperty('--sx', `${offsetX}px`);
-                el.style.setProperty('--sy', `${offsetY}px`);
-                el.style.setProperty('--swarm-color', agent.color);
-
-                setTimeout(() => {
-                    const rect = el.getBoundingClientRect();
-                    const w = Math.round(rect.width);
-                    const h = Math.round(rect.height);
-
-                    if (rect.top >= -100 && rect.top <= window.innerHeight + 100) {
-                        const targetX = Math.max(20, Math.min(window.innerWidth - 110, rect.left + rect.width * 0.65));
-                        const targetY = Math.max(20, Math.min(window.innerHeight - 40, rect.top + rect.height * 0.35));
-                        agent.el.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(0.95)`;
-
-                        snapLineV.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
-                        snapLineH.style.top = `${Math.round(rect.top + rect.height / 2)}px`;
-                    }
-
-                    const oldBox = el.querySelector('.swarm-box-overlay');
-                    if (oldBox) oldBox.remove();
-
-                    const box = document.createElement('div');
-                    box.className = 'swarm-box-overlay';
-                    box.style.setProperty('--swarm-color', agent.color);
-                    box.innerHTML = `
-                        <span class="swarm-handle sh-tl"></span>
-                        <span class="swarm-handle sh-tr"></span>
-                        <span class="swarm-handle sh-bl"></span>
-                        <span class="swarm-handle sh-br"></span>
-                        <span class="swarm-handle sh-tm"></span>
-                        <span class="swarm-handle sh-bm"></span>
-                        <span class="swarm-handle sh-ml"></span>
-                        <span class="swarm-handle sh-mr"></span>
-                        <span class="swarm-dim-tag">${w} × ${h}</span>
-                    `;
-                    el.appendChild(box);
-
-                    el.classList.add('swarm-building');
-
-                    setTimeout(() => {
-                        if (box && box.parentNode) box.remove();
-                        el.classList.remove('swarm-building');
-                        el.classList.add('swarm-done');
-                    }, 1350);
-
-                }, delay);
-            });
-
-            hudTimeout = setTimeout(() => {
-                agentNodes.forEach((a, i) => {
-                    const exitX = (i % 2 === 0) ? -120 : window.innerWidth + 120;
-                    const exitY = (i * 140) % window.innerHeight;
-                    a.el.style.transform = `translate3d(${exitX}px, ${exitY}px, 0)`;
-                    a.el.style.opacity = '0';
-                });
-                snapLineV.style.opacity = '0';
-                snapLineH.style.opacity = '0';
-                swarmHud.classList.remove('hud-active');
-            }, totalDuration);
-        }
-
-        const animatedGroups = new Set();
-        const sectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const groupName = entry.target.getAttribute('data-swarm-group');
-                    if (!animatedGroups.has(groupName)) {
-                        animatedGroups.add(groupName);
-                        const groupEls = document.querySelectorAll(`[data-swarm-group="${groupName}"] [data-swarm]`);
-                        runSwarmOnElements(Array.from(groupEls));
-                    }
-                }
-            });
-        }, { threshold: 0.15 });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-swarm-group]').forEach(sec => {
-                sectionObserver.observe(sec);
-            });
-        });
-
-        function replayVisibleSwarm() {
-            const visibleEls = Array.from(document.querySelectorAll('[data-swarm]')).filter(el => {
-                const r = el.getBoundingClientRect();
-                return r.bottom > 0 && r.top < window.innerHeight;
-            });
-            runSwarmOnElements(visibleEls);
-        }
-
-        /* =========================================================================
-           4. WHATSAPP & DIRECT GMAIL HANDLERS
-           ========================================================================= */
-        function sendToWhatsApp(e) {
-            e.preventDefault();
-            const name = document.getElementById('clientName').value;
-            const type = document.getElementById('projectType').value;
-            const details = document.getElementById('projectDetails').value;
-            const msg = `مرحباً عبد الرحمن، أنا ${name}%0Aنوع المشروع: ${type}%0Aالتفاصيل: ${details}`;
-            window.open(`https://wa.me/201552757725?text=${msg}`, '_blank');
-        }
-
-        function openGmailDirect(e) {
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isMobile) {
-                e.preventDefault();
-                window.location.href = "mailto:abdomsaleh90@gmail.com?subject=Project%20Inquiry%20-%20Abdo%20Saleh";
-            }
-        }
-
-        /* =========================================================================
-           5. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
-           ========================================================================= */
-        const cardWrappers = document.querySelectorAll('.card-3d-wrapper');
-        cardWrappers.forEach(wrapper => {
-            const glow = wrapper.querySelector('.card-ambient-glow');
-            
-            wrapper.addEventListener('mousemove', (e) => {
-                const rect = wrapper.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const rotateX = ((y - centerY) / centerY) * -14;
-                const rotateY = ((x - centerX) / centerX) * 14;
-
-                wrapper.style.transition = 'transform 0.08s ease-out, opacity 0.4s ease, filter 0.4s ease';
-                wrapper.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`;
-
-                if (glow) {
-                    const glowX = ((x - centerX) / centerX) * 18;
-                    const glowY = ((y - centerY) / centerY) * 18;
-                    glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) scale(1.12)`;
-                }
-            }, { passive: true });
-
-            wrapper.addEventListener('mouseleave', () => {
-                wrapper.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease, filter 0.45s ease';
-                wrapper.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-                if (glow) {
-                    glow.style.transform = 'translate3d(0, 0, 0) scale(1)';
-                }
-            });
-        });
-
-        /* =========================================================================
-           6. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
-           ========================================================================= */
-        const htmlEl = document.documentElement;
-        const morphCircle = document.getElementById('theme-morph-circle');
-
-        if (localStorage.getItem('abdo_theme') === 'light') {
-            htmlEl.classList.remove('dark');
-        }
-
-        function toggleTheme(e) {
-            const isDark = htmlEl.classList.contains('dark');
-            const x = e ? e.clientX : window.innerWidth - 60;
-            const y = e ? e.clientY : 40;
-
-            morphCircle.style.backgroundColor = isDark ? '#F8F6F2' : '#121212';
-            morphCircle.style.transition = 'none';
-            morphCircle.style.clipPath = `circle(0px at ${x}px ${y}px)`;
-
-            requestAnimationFrame(() => {
-                morphCircle.style.transition = 'clip-path 0.65s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s ease';
-                morphCircle.style.opacity = '0.35';
-                morphCircle.style.clipPath = `circle(150vmax at ${x}px ${y}px)`;
-
-                htmlEl.classList.toggle('dark');
-                localStorage.setItem('abdo_theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
-
-                setTimeout(() => {
-                    morphCircle.style.opacity = '0';
-                    setTimeout(() => {
-                        morphCircle.style.clipPath = `circle(0px at ${x}px ${y}px)`;
-                    }, 350);
-                }, 400);
-            });
-        }
-
-        /* =========================================================================
-           7. ZERO-LATENCY 1:1 SMILEY CURSOR ENGINE (Instant Hardware Tracking)
-           ========================================================================= */
-        const cursor = document.getElementById('smiley-cursor');
-        const eyesOpen = document.getElementById('eyes-open');
-        const eyesBlink = document.getElementById('eyes-blink');
-        const mouthSmile = document.getElementById('mouth-smile');
-        const mouthLaugh = document.getElementById('mouth-laugh');
-        let isHovering = false;
-
-        // Direct 1:1 update on mousemove -> Zero lag, moves at exact hardware mouse speed
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-        }, { passive: true });
-
-        window.addEventListener('mousedown', () => {
-            cursor.classList.add('cursor-click');
-            eyesOpen.style.display = 'none';
-            eyesBlink.style.display = 'block';
-            mouthSmile.style.display = 'none';
-            mouthLaugh.style.display = 'block';
-        });
-
-        window.addEventListener('mouseup', () => {
-            cursor.classList.remove('cursor-click');
-            eyesOpen.style.display = 'block';
-            eyesBlink.style.display = 'none';
-            if (!isHovering) {
-                mouthSmile.style.display = 'block';
-                mouthLaugh.style.display = 'none';
-            }
-        });
-
-        document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                isHovering = true;
-                cursor.classList.add('cursor-hover');
-                mouthSmile.style.display = 'none';
-                mouthLaugh.style.display = 'block';
-            });
-            el.addEventListener('mouseleave', () => {
-                isHovering = false;
-                cursor.classList.remove('cursor-hover');
-                mouthSmile.style.display = 'block';
-                mouthLaugh.style.display = 'none';
-            });
-        });
-    </script>
-</body>
-</html>
+                    </
