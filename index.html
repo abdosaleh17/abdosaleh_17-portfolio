@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FF922B'/%3E%3Cstop offset='100%25' stop-color='%23DC5621'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23121212' stroke='url(%23g)' stroke-width='6'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-weight='900' font-size='48' fill='url(%23g)'%3EAS%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -19,7 +19,8 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'Cairo', 'sans-serif'],
-                        arabic: ['Cairo', 'sans-serif']
+                        arabic: ['Cairo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
                     }
                 }
             }
@@ -29,24 +30,26 @@
         /* Theme CSS Variables for Seamless Color Inversion */
         :root {
             --bg-main: #F8F6F2;
-            --bg-sec: #EFECE6;
+            --bg-sec: rgba(239, 236, 230, 0.75);
             --text-main: #121212;
             --text-muted: #52525B;
             --glass-bg: rgba(255, 255, 255, 0.82);
             --glass-border: rgba(220, 86, 33, 0.25);
             --input-bg: rgba(255, 255, 255, 0.9);
             --card-shadow: 0 16px 36px rgba(18, 18, 18, 0.08);
+            --wave-opacity: 0.28;
         }
 
         html.dark {
             --bg-main: #121212;
-            --bg-sec: #0A0A0A;
+            --bg-sec: rgba(10, 10, 10, 0.72);
             --text-main: #FFFFFF;
             --text-muted: #9CA3AF;
             --glass-bg: rgba(24, 24, 26, 0.78);
             --glass-border: rgba(220, 86, 33, 0.25);
             --input-bg: rgba(0, 0, 0, 0.55);
             --card-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+            --wave-opacity: 0.52;
         }
 
         body {
@@ -56,8 +59,32 @@
             overflow-x: hidden;
         }
 
+        /* =========================================================
+           1. 3D SLICED WAVE BACKGROUND (30% WIDTH, SCROLL-REACTIVE)
+           ========================================================= */
+        #scroll-wave-canvas {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 34vw;
+            min-width: 280px;
+            max-width: 520px;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: var(--wave-opacity);
+            transition: opacity 0.6s ease;
+            filter: drop-shadow(-10px 0 35px rgba(220, 86, 33, 0.25));
+        }
+
+        main, header, section, footer {
+            position: relative;
+            z-index: 10;
+        }
+
         .sec-bg {
             background-color: var(--bg-sec);
+            backdrop-filter: blur(8px);
             transition: background-color 0.65s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -105,6 +132,62 @@
         }
 
         /* =========================================================
+           2. HERO NLE TIMELINE UI (IMAGES 2 & 3 INSPIRED)
+           ========================================================= */
+        .nle-timeline-box {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(220, 86, 33, 0.35);
+        }
+        .nle-track-clip {
+            height: 22px;
+            border-radius: 6px;
+            position: relative;
+            transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+        }
+        .nle-track-clip:hover {
+            transform: scaleY(1.15);
+            filter: brightness(1.2);
+            box-shadow: 0 0 16px rgba(220, 86, 33, 0.6);
+        }
+        #hero-playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 52%;
+            width: 2px;
+            background: #FFFFFF;
+            box-shadow: 0 0 12px #FFFFFF, 0 0 20px #DC5621;
+            pointer-events: none;
+            z-index: 30;
+            transition: left 0.08s linear;
+        }
+        html:not(.dark) #hero-playhead {
+            background: #DC5621;
+            box-shadow: 0 0 10px rgba(220, 86, 33, 0.8);
+        }
+
+        /* =========================================================
+           3. SOFTWARE CUPS WITH PREMIERE TIMELINE LIDS (IMAGE 4)
+           ========================================================= */
+        @keyframes liquidWave {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-25px); }
+            100% { transform: translateX(0); }
+        }
+        .cup-liquid-wave {
+            animation: liquidWave 3.5s ease-in-out infinite;
+        }
+        @keyframes cubeBob {
+            0%, 100% { transform: translateY(0px) rotate(var(--rot, -6deg)); }
+            50% { transform: translateY(-6px) rotate(calc(var(--rot, -6deg) * -1)); }
+        }
+        .floating-cube {
+            animation: cubeBob 3.2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        /* =========================================================
            AFTER EFFECTS SWARM REBUILD ENGINE (1.5s SMOOTH KEYFRAMES)
            ========================================================= */
         [data-swarm] {
@@ -112,7 +195,6 @@
             will-change: transform, opacity, filter;
         }
 
-        /* Smooth AE Easy-Ease Keyframe Animation (1.5s) */
         @keyframes aeSwarmConstruct {
             0% {
                 opacity: 0;
@@ -146,7 +228,6 @@
             filter: none;
         }
 
-        /* Figma / AE Selection Bounding Box Overlay on Elements Being Built */
         .swarm-box-overlay {
             position: absolute;
             inset: -5px;
@@ -165,7 +246,6 @@
             100% { opacity: 0; }
         }
 
-        /* 8 Corner & Side Resize Handles */
         .swarm-handle {
             position: absolute;
             width: 7px;
@@ -183,7 +263,6 @@
         .sh-ml { top: calc(50% - 3.5px); left: -4px; }
         .sh-mr { top: calc(50% - 3.5px); right: -4px; }
 
-        /* Dimension Pill Tag under Bounding Box */
         .swarm-dim-tag {
             position: absolute;
             bottom: -20px;
@@ -201,7 +280,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         }
 
-        /* Flying Multiplayer Swarm Agent Cursors Layer */
         #swarm-stage {
             position: fixed;
             inset: 0;
@@ -235,7 +313,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Red Smart Alignment Snap Line (like Figma / AE) */
         #swarm-snap-line-v, #swarm-snap-line-h {
             position: fixed;
             background: rgba(244, 63, 94, 0.65);
@@ -244,16 +321,9 @@
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        #swarm-snap-line-v {
-            top: 0; bottom: 0; width: 1px; left: 50%;
-            box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
-        }
-        #swarm-snap-line-h {
-            left: 0; right: 0; height: 1px; top: 50%;
-            box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
-        }
+        #swarm-snap-line-v { top: 0; bottom: 0; width: 1px; left: 50%; box-shadow: 0 0 8px rgba(244, 63, 94, 0.8); }
+        #swarm-snap-line-h { left: 0; right: 0; height: 1px; top: 50%; box-shadow: 0 0 8px rgba(244, 63, 94, 0.8); }
 
-        /* Bottom Swarm HUD Status Pill (Auto-hides after 1.5s) */
         #swarm-hud {
             position: fixed;
             bottom: 22px;
@@ -272,9 +342,7 @@
         /* ==========================================
            3D PORTFOLIO CARDS + AMBIENT GLOW + FADE
            ========================================== */
-        .portfolio-grid {
-            perspective: 1400px;
-        }
+        .portfolio-grid { perspective: 1400px; }
 
         .card-3d-wrapper {
             position: relative;
@@ -293,18 +361,14 @@
         .card-3d-wrapper.swarm-done:nth-child(2) { animation: idleFloat 5.6s ease-in-out infinite 0.6s; }
         .card-3d-wrapper.swarm-done:nth-child(3) { animation: idleFloat 6.2s ease-in-out infinite 1.2s; }
 
-        .portfolio-grid:hover .card-3d-wrapper {
-            animation-play-state: paused;
-        }
+        .portfolio-grid:hover .card-3d-wrapper { animation-play-state: paused; }
 
-        /* Sibling Fade & Depth Blur Effect when one card is hovered */
         .portfolio-grid:hover .card-3d-wrapper:not(:hover) {
             opacity: 0.38 !important;
             filter: blur(2.5px) grayscale(35%) !important;
             transform: scale(0.94) translateZ(-30px) !important;
         }
 
-        /* Ambient Backlight Glow Behind Each 3D Card */
         .card-ambient-glow {
             position: absolute;
             inset: -12px;
@@ -341,9 +405,7 @@
             transform: translateZ(35px);
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .card-3d-wrapper:hover .pop-3d-img {
-            transform: translateZ(55px) scale(1.03);
-        }
+        .card-3d-wrapper:hover .pop-3d-img { transform: translateZ(55px) scale(1.03); }
         .pop-3d-text { transform: translateZ(25px); }
         .pop-3d-btn { transform: translateZ(40px); }
 
@@ -360,11 +422,7 @@
             transition: clip-path 0.75s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        .theme-icon-wrapper {
-            position: relative;
-            width: 24px;
-            height: 24px;
-        }
+        .theme-icon-wrapper { position: relative; width: 24px; height: 24px; }
         .sun-svg, .moon-svg {
             position: absolute;
             inset: 0;
@@ -377,14 +435,10 @@
 
         /* Custom 3D Cartoon Smiley Cursor (Desktop Only) */
         @media (pointer: fine) {
-            body, a, button, input, select, textarea {
-                cursor: none !important;
-            }
+            body, a, button, input, select, textarea { cursor: none !important; }
         }
         @media (pointer: coarse) {
-            #smiley-cursor {
-                display: none !important;
-            }
+            #smiley-cursor { display: none !important; }
         }
 
         #smiley-cursor {
@@ -407,18 +461,14 @@
             filter: drop-shadow(0 10px 20px rgba(220, 86, 33, 0.65));
         }
 
-        #smiley-cursor.cursor-click svg {
-            transform: scale(0.82) rotate(-8deg);
-        }
-
-        #smiley-cursor svg {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        #smiley-cursor.cursor-click svg { transform: scale(0.82) rotate(-8deg); }
+        #smiley-cursor svg { width: 100%; height: 100%; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1); }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-brand selection:text-white">
+
+    <!-- 1. 3D SLICED RIBBON WAVE BACKGROUND (30% Width, Moves with Scroll Down behind all sections) -->
+    <canvas id="scroll-wave-canvas" aria-hidden="true"></canvas>
 
     <!-- Morphing Theme Overlay -->
     <div id="theme-morph-circle"></div>
@@ -428,7 +478,7 @@
     <div id="swarm-snap-line-h"></div>
     <div id="swarm-stage"></div>
 
-    <!-- Bottom Swarm HUD Pill (Shows during 1.5s build) -->
+    <!-- Bottom Swarm HUD Pill -->
     <div id="swarm-hud" class="glass px-4 py-2 rounded-full flex items-center gap-2.5 border border-brand/40 shadow-2xl">
         <span class="flex gap-1">
             <span class="w-2 h-2 rounded-full bg-brand animate-ping"></span>
@@ -482,19 +532,18 @@
             
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-theme-muted">
                 <a href="#portfolio" class="hover:text-brand transition">Portfolio</a>
+                <a href="#experience" class="hover:text-brand transition">Experience & Skills</a>
                 <a href="#testimonials" class="hover:text-brand transition">Client Reviews</a>
                 <a href="#contact" class="hover:text-brand transition">Contact</a>
                 <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="hover:text-brand transition">Instagram</a>
             </nav>
 
             <div class="flex items-center gap-2.5">
-                <!-- Replay Swarm Animation Button -->
                 <button onclick="replayVisibleSwarm()" class="glass px-3 py-2 rounded-xl text-xs font-bold hover:border-brand transition flex items-center gap-1.5" title="Replay 1.5s Swarm Animation">
                     <span class="text-brand">⚡</span>
                     <span class="hidden sm:inline">Swarm</span>
                 </button>
 
-                <!-- Morphing Dark / Light Mode Toggle Button -->
                 <button id="theme-toggle" onclick="toggleTheme(event)" aria-label="Toggle Theme" class="glass p-2.5 rounded-xl hover:border-brand transition flex items-center justify-center" title="Switch Light / Dark Mode">
                     <div class="theme-icon-wrapper">
                         <svg class="sun-svg text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -521,8 +570,8 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="pt-36 pb-20 px-4 text-center relative overflow-hidden" data-swarm-group="hero">
+    <!-- Hero Section + Interactive Video Editor Timeline (Images 2 & 3 Inspired) -->
+    <section class="pt-36 pb-16 px-4 text-center relative overflow-hidden" data-swarm-group="hero">
         <div class="max-w-4xl mx-auto">
             <div data-swarm class="inline-block mb-6">
                 <span class="inline-block px-4 py-1.5 rounded-full glass text-brand text-xs font-bold uppercase tracking-widest">
@@ -555,18 +604,98 @@
             <p data-swarm class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
                 Transforming ideas into cinematic stories, viral educational promos, and next-gen AI commercials for top instructors and brands across Egypt & the MENA region.
             </p>
-            <div data-swarm class="flex flex-wrap justify-center gap-4">
+
+            <div data-swarm class="flex flex-wrap justify-center gap-4 mb-14">
                 <a href="#portfolio" class="bg-brand hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg">
                     Explore My Work
                 </a>
-                <a href="https://wa.me/201552757725" target="_blank" rel="noopener noreferrer" class="glass hover:border-brand font-bold px-8 py-4 rounded-2xl transition">
-                    Book a Project
+                <a href="#experience" class="glass hover:border-brand font-bold px-8 py-4 rounded-2xl transition">
+                    My Workflow & Skills
                 </a>
+            </div>
+
+            <!-- 2. INTERACTIVE NLE VIDEO EDITOR TIMELINE SHOWCASE (Images 2 & 3) -->
+            <div data-swarm id="hero-nle-timeline" class="nle-timeline-box glass rounded-3xl p-5 md:p-7 max-w-3xl mx-auto text-left shadow-2xl">
+                <!-- Timeline Header Bar & Timecode -->
+                <div class="flex items-center justify-between border-b border-brand/20 pb-3 mb-4 text-xs font-mono">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-brand animate-pulse"></span>
+                        <span class="font-bold tracking-wider uppercase">Sequence 01 — Emotional_Storytelling_Master.prproj</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-brand/15 text-brand px-3 py-1 rounded-md font-bold">
+                        <span>▶</span>
+                        <span id="nle-timecode">00:00:06:14</span>
+                    </div>
+                </div>
+
+                <!-- Timeline Tracks Container -->
+                <div class="relative py-2 space-y-2.5 select-none">
+                    <!-- Interactive Scrubbing Playhead -->
+                    <div id="hero-playhead">
+                        <div class="w-3.5 h-3.5 bg-brand rotate-45 -ml-[6px] -mt-1 rounded-xs shadow"></div>
+                    </div>
+
+                    <!-- Ruler Ticks -->
+                    <div class="flex justify-between text-[10px] font-mono text-theme-muted opacity-60 px-2 pb-1">
+                        <span>00:00</span><span>00:02</span><span>00:04</span><span>00:06</span><span>00:08</span><span>00:10</span><span>00:12</span>
+                    </div>
+
+                    <!-- Track V3: Effects & AI Visuals -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-10 text-[10px] font-mono font-bold text-theme-muted">V3</span>
+                        <div class="flex-1 flex items-center gap-2 pl-[14%]">
+                            <div class="nle-track-clip w-[36%] bg-gradient-to-r from-amber-400 to-orange-500 shadow"></div>
+                            <span class="text-xs font-mono font-bold text-amber-400">+ AI Visuals & VFX</span>
+                        </div>
+                    </div>
+
+                    <!-- Track V2: B-Roll & Kinetic Typography -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-10 text-[10px] font-mono font-bold text-theme-muted">V2</span>
+                        <div class="flex-1 flex items-center gap-1.5 pl-[6%]">
+                            <div class="nle-track-clip w-[18%] bg-brand/80"></div>
+                            <div class="nle-track-clip w-[8%] bg-white/80 dark:bg-white/90"></div>
+                            <div class="nle-track-clip w-[28%] bg-gradient-to-r from-brand to-red-500"></div>
+                            <div class="nle-track-clip w-[14%] bg-orange-400"></div>
+                            <span class="text-xs font-mono font-bold text-brand ml-1">+ Shot & Cut</span>
+                        </div>
+                    </div>
+
+                    <!-- Track V1: Main Storyline -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-10 text-[10px] font-mono font-bold text-theme-muted">V1</span>
+                        <div class="flex-1 flex items-center gap-2 pl-[10%]">
+                            <div class="nle-track-clip w-[22%] bg-orange-600/90"></div>
+                            <div class="nle-track-clip w-[32%] bg-gradient-to-r from-orange-500 to-amber-500"></div>
+                            <div class="nle-track-clip w-[18%] bg-brand"></div>
+                            <span class="text-xs font-mono font-bold text-orange-400">+ Storytelling</span>
+                        </div>
+                    </div>
+
+                    <!-- Track A1: Voiceover & Dialogue -->
+                    <div class="flex items-center gap-2 pt-1 border-t border-brand/10">
+                        <span class="w-10 text-[10px] font-mono font-bold text-theme-muted">A1</span>
+                        <div class="flex-1 flex items-center gap-2 pl-[24%]">
+                            <div class="nle-track-clip w-[38%] bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+                            <span class="text-xs font-mono font-bold text-emerald-400">+ Audio (Silence Removed)</span>
+                        </div>
+                    </div>
+
+                    <!-- Track A2: Sound Design & Risers -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-10 text-[10px] font-mono font-bold text-theme-muted">A2</span>
+                        <div class="flex-1 flex items-center gap-2 pl-[16%]">
+                            <div class="nle-track-clip w-[28%] bg-gradient-to-r from-amber-500/80 to-brand/90"></div>
+                            <div class="nle-track-clip w-[20%] bg-amber-400/90"></div>
+                            <span class="text-xs font-mono font-bold text-amber-400">+ Sound Effect</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Portfolio Categories Section (Interactive 3D Cards + Backlight Glow + Spotlight Fade) -->
+    <!-- Portfolio Categories Section -->
     <section id="portfolio" class="py-20 px-4" data-swarm-group="portfolio">
         <div class="max-w-6xl mx-auto">
             <div data-swarm class="text-center mb-16">
@@ -575,7 +704,6 @@
             </div>
 
             <div class="portfolio-grid grid grid-cols-1 md:grid-cols-3 gap-10">
-                
                 <!-- Card 1: Commercial Edits -->
                 <div data-swarm class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
@@ -632,13 +760,218 @@
                         </div>
                     </a>
                 </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- 3. EXPERIENCE, AI WORKFLOW & SOFTWARE CUPS SECTION (Image 4 + Image 2 Lid) -->
+    <section id="experience" class="py-20 px-4 sec-bg" dir="rtl" data-swarm-group="experience">
+        <div class="max-w-6xl mx-auto font-arabic">
+            <div data-swarm class="text-center mb-16">
+                <span class="inline-block px-4 py-1 rounded-full glass text-brand text-xs font-bold mb-3">
+                    EXPERIENCE & WORKFLOW
+                </span>
+                <h2 class="text-3xl md:text-5xl font-black mb-3">خبرتي، أدواتي، <span class="gradient-text">وطريقة شغلي</span></h2>
+                <p class="text-theme-muted max-w-2xl mx-auto">دمج الخبرة السينمائية مع أسرع أدوات الذكاء الاصطناعي والـ Plugins لإنجاز المشاريع بأعلى جودة وفي وقت قياسي</p>
+            </div>
+
+            <!-- Experience & Workflow Pillars Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                <!-- Pillar 1: 2 Years Video Editing -->
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                    <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">🎬</div>
+                    <h3 class="text-xl font-black mb-2">خبرة سنتين في الـ Video Editing</h3>
+                    <p class="text-theme-muted text-sm leading-relaxed">
+                        سنتين من العمل المستمر في مونتاج الإعلانات التجارية، بروموهات المحاضرين، والريلز السريعة مع ضبط الإيقاع البصري والصوتي لشد انتباه المشاهد من أول ثانية.
+                    </p>
+                </div>
+
+                <!-- Pillar 2: Videographer & Storytelling -->
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
+                    <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">🎥</div>
+                    <h3 class="text-xl font-black mb-2">Videographer & Storytelling</h3>
+                    <p class="text-theme-muted text-sm leading-relaxed">
+                        خبرة ميدانية قوية كـ Videographer في تصوير السناتر والإعلانات، مع شغف وتطوير مستمر في فن الـ Storytelling لتحويل أي فكرة لقصة تلمس مشاعر الجمهور.
+                    </p>
+                </div>
+
+                <!-- Pillar 3: AI Workflow & Custom Plugins -->
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition md:col-span-2 lg:col-span-1">
+                    <div class="w-12 h-12 rounded-2xl bg-brand/15 border border-brand/40 flex items-center justify-center text-2xl mb-4">⚡</div>
+                    <h3 class="text-xl font-black mb-2">AI Workflow & Fast Plugins</h3>
+                    <p class="text-theme-muted text-sm leading-relaxed">
+                        الاعتماد على نماذج الـ AI في بناء الـ Storyboard وتطوير الـ Plugins لتعزيز الإبداع، مع استخدام إضافات إزالة السكتات التلقائية، الأنميشن الجاهز، وقوالب النصوص لتوفير الوقت والسرعة في التسليم.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Software Mastery Cups (Image 4 Concept + Premiere Timeline Lid from Image 2) -->
+            <div data-swarm class="glass rounded-3xl p-8 md:p-12" dir="ltr">
+                <div class="text-center mb-12 font-arabic" dir="rtl">
+                    <h3 class="text-2xl md:text-4xl font-black mb-2">إجادة البرامج <span class="gradient-text">(Software Mastery Cups)</span></h3>
+                    <p class="text-theme-muted text-sm">كل كوب يعبر عن نسبة إجادتي للبرنامج، ومغطى بشريط Timeline من Premiere Pro بألوان الهوية</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-end justify-items-center">
+                    
+                    <!-- CUP 1: Adobe Premiere Pro (90%) -->
+                    <div class="flex flex-col items-center group w-full max-w-[240px]">
+                        <div class="relative w-48 h-64 mb-4">
+                            <svg viewBox="0 0 200 260" class="w-full h-full overflow-visible drop-shadow-[0_15px_30px_rgba(220,86,33,0.3)]">
+                                <defs>
+                                    <clipPath id="cupClip1">
+                                        <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z"/>
+                                    </clipPath>
+                                    <linearGradient id="liqGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#FF922B"/>
+                                        <stop offset="50%" stop-color="#DC5621"/>
+                                        <stop offset="100%" stop-color="#7C2D12"/>
+                                    </linearGradient>
+                                </defs>
+
+                                <!-- Glowing Straw / Playhead -->
+                                <rect x="108" y="4" width="9" height="235" rx="4" transform="rotate(6 108 120)" fill="#FFB347" opacity="0.9"/>
+
+                                <!-- Cup Liquid Fill (90% Full -> y=76) -->
+                                <g clip-path="url(#cupClip1)">
+                                    <rect x="20" y="58" width="160" height="200" fill="rgba(255,255,255,0.03)"/>
+                                    <g class="cup-liquid-wave">
+                                        <path d="M 0 76 Q 40 68 80 76 T 160 76 T 240 76 L 240 255 L 0 255 Z" fill="url(#liqGrad1)"/>
+                                    </g>
+                                    <!-- Floating 3D Pr Cube Inside Cup -->
+                                    <g class="floating-cube" style="--rot: -8deg;">
+                                        <rect x="68" y="95" width="56" height="56" rx="12" fill="#1E1B2E" stroke="#FF922B" stroke-width="3"/>
+                                        <text x="96" y="132" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="28" fill="#FF922B">Pr</text>
+                                    </g>
+                                    <!-- Percentage Badge Inside Cup -->
+                                    <text x="100" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="800" font-size="24" fill="#FFFFFF">90%</text>
+                                </g>
+
+                                <!-- Glass Cup Outline & Specular Highlights -->
+                                <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z" fill="none" stroke="#FF922B" stroke-width="3" stroke-opacity="0.7"/>
+                                <line x1="44" y1="72" x2="58" y2="225" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.35"/>
+
+                                <!-- PREMIERE TIMELINE LID (Brand Colored Strips) -->
+                                <g transform="translate(14, 34)">
+                                    <rect x="0" y="0" width="172" height="26" rx="7" fill="#18181B" stroke="#DC5621" stroke-width="2"/>
+                                    <!-- Track 1 Clips -->
+                                    <rect x="8" y="5" width="46" height="6" rx="3" fill="#DC5621"/>
+                                    <rect x="58" y="5" width="68" height="6" rx="3" fill="#FF922B"/>
+                                    <rect x="130" y="5" width="34" height="6" rx="3" fill="#FFE066"/>
+                                    <!-- Track 2 Clips -->
+                                    <rect x="16" y="14" width="74" height="6" rx="3" fill="#FFB347"/>
+                                    <rect x="95" y="14" width="58" height="6" rx="3" fill="#DC5621"/>
+                                    <!-- Mini Playhead on Lid -->
+                                    <line x1="92" y1="0" x2="92" y2="26" stroke="#FFFFFF" stroke-width="2"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-black">Premiere Pro</h4>
+                        <span class="text-sm text-brand font-mono font-bold">90% Mastery</span>
+                    </div>
+
+                    <!-- CUP 2: CapCut Pro (90%) -->
+                    <div class="flex flex-col items-center group w-full max-w-[240px]">
+                        <div class="relative w-48 h-64 mb-4">
+                            <svg viewBox="0 0 200 260" class="w-full h-full overflow-visible drop-shadow-[0_15px_30px_rgba(220,86,33,0.3)]">
+                                <defs>
+                                    <clipPath id="cupClip2">
+                                        <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z"/>
+                                    </clipPath>
+                                </defs>
+
+                                <!-- Glowing Straw / Playhead -->
+                                <rect x="108" y="4" width="9" height="235" rx="4" transform="rotate(-5 108 120)" fill="#FF922B" opacity="0.9"/>
+
+                                <!-- Cup Liquid Fill (90% Full -> y=76) -->
+                                <g clip-path="url(#cupClip2)">
+                                    <rect x="20" y="58" width="160" height="200" fill="rgba(255,255,255,0.03)"/>
+                                    <g class="cup-liquid-wave">
+                                        <path d="M 0 76 Q 40 84 80 76 T 160 76 T 240 76 L 240 255 L 0 255 Z" fill="url(#liqGrad1)"/>
+                                    </g>
+                                    <!-- Floating 3D CapCut Pro Cube Inside Cup -->
+                                    <g class="floating-cube" style="--rot: 7deg;">
+                                        <rect x="68" y="95" width="56" height="56" rx="12" fill="#121212" stroke="#FFE066" stroke-width="3"/>
+                                        <path d="M 80 112 L 112 134 M 80 134 L 112 112" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+                                        <rect x="76" y="108" width="12" height="28" rx="3" stroke="#FF922B" stroke-width="2.5" fill="none"/>
+                                    </g>
+                                    <text x="100" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="800" font-size="24" fill="#FFFFFF">90%</text>
+                                </g>
+
+                                <!-- Glass Cup Outline -->
+                                <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z" fill="none" stroke="#FF922B" stroke-width="3" stroke-opacity="0.7"/>
+                                <line x1="44" y1="72" x2="58" y2="225" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.35"/>
+
+                                <!-- PREMIERE TIMELINE LID -->
+                                <g transform="translate(14, 34)">
+                                    <rect x="0" y="0" width="172" height="26" rx="7" fill="#18181B" stroke="#DC5621" stroke-width="2"/>
+                                    <rect x="10" y="5" width="62" height="6" rx="3" fill="#FF922B"/>
+                                    <rect x="76" y="5" width="44" height="6" rx="3" fill="#DC5621"/>
+                                    <rect x="124" y="5" width="38" height="6" rx="3" fill="#FFB347"/>
+                                    <rect x="22" y="14" width="54" height="6" rx="3" fill="#DC5621"/>
+                                    <rect x="82" y="14" width="68" height="6" rx="3" fill="#FFE066"/>
+                                    <line x1="112" y1="0" x2="112" y2="26" stroke="#FFFFFF" stroke-width="2"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-black">CapCut (Pro)</h4>
+                        <span class="text-sm text-brand font-mono font-bold">90% Mastery</span>
+                    </div>
+
+                    <!-- CUP 3: Adobe Photoshop (60%) -->
+                    <div class="flex flex-col items-center group w-full max-w-[240px]">
+                        <div class="relative w-48 h-64 mb-4">
+                            <svg viewBox="0 0 200 260" class="w-full h-full overflow-visible drop-shadow-[0_15px_30px_rgba(220,86,33,0.3)]">
+                                <defs>
+                                    <clipPath id="cupClip3">
+                                        <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z"/>
+                                    </clipPath>
+                                </defs>
+
+                                <!-- Glowing Straw / Playhead -->
+                                <rect x="108" y="4" width="9" height="235" rx="4" transform="rotate(5 108 120)" fill="#DC5621" opacity="0.9"/>
+
+                                <!-- Cup Liquid Fill (60% Full -> y=134) -->
+                                <g clip-path="url(#cupClip3)">
+                                    <rect x="20" y="58" width="160" height="200" fill="rgba(255,255,255,0.03)"/>
+                                    <g class="cup-liquid-wave">
+                                        <path d="M 0 134 Q 40 126 80 134 T 160 134 T 240 134 L 240 255 L 0 255 Z" fill="url(#liqGrad1)"/>
+                                    </g>
+                                    <!-- Floating 3D Ps Cube Inside Cup (Floating at 60% surface) -->
+                                    <g class="floating-cube" style="--rot: -6deg;">
+                                        <rect x="68" y="122" width="56" height="56" rx="12" fill="#17202A" stroke="#FFB347" stroke-width="3"/>
+                                        <text x="96" y="159" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="28" fill="#FFB347">Ps</text>
+                                    </g>
+                                    <text x="100" y="222" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="800" font-size="24" fill="#FFFFFF">60%</text>
+                                </g>
+
+                                <!-- Glass Cup Outline -->
+                                <path d="M 32 58 L 168 58 L 148 236 C 147 244 140 248 132 248 L 68 248 C 60 248 53 244 52 236 Z" fill="none" stroke="#FF922B" stroke-width="3" stroke-opacity="0.7"/>
+                                <line x1="44" y1="72" x2="58" y2="225" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.35"/>
+
+                                <!-- PREMIERE TIMELINE LID -->
+                                <g transform="translate(14, 34)">
+                                    <rect x="0" y="0" width="172" height="26" rx="7" fill="#18181B" stroke="#DC5621" stroke-width="2"/>
+                                    <rect x="8" y="5" width="38" height="6" rx="3" fill="#FFE066"/>
+                                    <rect x="50" y="5" width="56" height="6" rx="3" fill="#DC5621"/>
+                                    <rect x="110" y="5" width="52" height="6" rx="3" fill="#FF922B"/>
+                                    <rect x="14" y="14" width="64" height="6" rx="3" fill="#FF922B"/>
+                                    <rect x="84" y="14" width="52" height="6" rx="3" fill="#DC5621"/>
+                                    <line x1="68" y1="0" x2="68" y2="26" stroke="#FFFFFF" stroke-width="2"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-black">Photoshop</h4>
+                        <span class="text-sm text-brand font-mono font-bold">60% Mastery (Design & Thumbnails)</span>
+                    </div>
+
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-20 px-4 sec-bg" dir="rtl" data-swarm-group="testimonials">
+    <section id="testimonials" class="py-20 px-4" dir="rtl" data-swarm-group="testimonials">
         <div class="max-w-6xl mx-auto font-arabic">
             <div data-swarm class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">آراء وتقييمات <span class="gradient-text">شركاء النجاح</span></h2>
@@ -646,7 +979,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Client 1: Eng. Mohamed Zain -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -658,7 +990,6 @@
                     </div>
                 </div>
 
-                <!-- Client 2: Dr. Murtadha Al-Salami -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -670,7 +1001,6 @@
                     </div>
                 </div>
 
-                <!-- Client 3: Mr. Mohamed Sharaf -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -682,7 +1012,6 @@
                     </div>
                 </div>
 
-                <!-- Client 4: Mr. Belal El-Shaer -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -694,7 +1023,6 @@
                     </div>
                 </div>
 
-                <!-- Client 5: Mr. Ahmed El-Falala -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -706,7 +1034,6 @@
                     </div>
                 </div>
 
-                <!-- Client 6: Mr. El-Saeedy -->
                 <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
@@ -722,7 +1049,7 @@
     </section>
 
     <!-- Contact & Booking Section -->
-    <section id="contact" class="py-20 px-4" data-swarm-group="contact">
+    <section id="contact" class="py-20 px-4 sec-bg" data-swarm-group="contact">
         <div data-swarm class="max-w-4xl mx-auto glass rounded-3xl p-8 md:p-12">
             <div class="text-center mb-10">
                 <h2 class="text-3xl md:text-4xl font-black mb-3">Ready to Start Your <span class="gradient-text">Next Project?</span></h2>
@@ -738,14 +1065,12 @@
                     <div class="text-brand font-black text-lg mb-1">Instagram</div>
                     <div class="text-sm text-theme-muted font-semibold">@abdosaleh_17</div>
                 </a>
-                <!-- Direct Gmail Inbox Compose Link -->
                 <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abdomsaleh90@gmail.com&su=Project%20Inquiry%20-%20Abdo%20Saleh" onclick="openGmailDirect(event)" target="_blank" rel="noopener noreferrer" class="glass p-5 rounded-2xl text-center glow-hover transition block">
                     <div class="text-brand font-black text-lg mb-1">Gmail Inbox ✉️</div>
                     <div class="text-sm text-theme-muted font-semibold">abdomsaleh90@gmail.com</div>
                 </a>
             </div>
 
-            <!-- Direct WhatsApp Booking Form -->
             <form onsubmit="sendToWhatsApp(event)" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="clientName" required placeholder="Your Name / اسمك" class="w-full input-theme rounded-xl px-4 py-3.5 focus:border-brand focus:outline-none">
@@ -776,10 +1101,103 @@
         </div>
     </footer>
 
-    <!-- Interactive Scripts: Swarm Rebuild Engine, WhatsApp, Direct Gmail, 3D Cards, Theme & Smiley Cursor -->
+    <!-- Interactive Scripts -->
     <script>
         /* =========================================================================
-           1. AFTER EFFECTS SWARM REBUILD ENGINE (1.5s Smooth Keyframe Construction)
+           1. 3D SLICED RIBBON WAVE ENGINE (Image 1 - 30% Width, Moves with Scroll)
+           ========================================================================= */
+        const waveCanvas = document.getElementById('scroll-wave-canvas');
+        const ctx = waveCanvas.getContext('2d');
+        let targetScroll = 0;
+        let currentScroll = 0;
+        let timePhase = 0;
+
+        function resizeWaveCanvas() {
+            waveCanvas.width = waveCanvas.offsetWidth * window.devicePixelRatio;
+            waveCanvas.height = window.innerHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resizeWaveCanvas);
+        resizeWaveCanvas();
+
+        window.addEventListener('scroll', () => {
+            targetScroll = window.scrollY;
+        }, { passive: true });
+
+        function renderSlicedWave() {
+            currentScroll += (targetScroll - currentScroll) * 0.08;
+            timePhase += 0.015;
+
+            const w = waveCanvas.offsetWidth;
+            const h = window.innerHeight;
+            ctx.clearRect(0, 0, w, h);
+
+            const numSlices = 58;
+            const sliceSpacing = h / (numSlices - 6);
+            const scrollShift = currentScroll * 0.0045;
+
+            for (let i = 0; i < numSlices; i++) {
+                const y = (i - 3) * sliceSpacing;
+                const progress = i / numSlices;
+                const angle = progress * Math.PI * 2.4 - scrollShift + timePhase;
+
+                const waveCenterX = w * 0.56 + Math.sin(angle) * (w * 0.24);
+                const twist = Math.cos(angle);
+                const rx = Math.max(24, w * 0.28 * (0.65 + 0.35 * Math.sin(angle * 0.8)));
+                const ry = 14 + Math.abs(twist) * 20;
+                const tilt = twist * 0.55;
+
+                ctx.save();
+                ctx.translate(waveCenterX, y);
+                ctx.rotate(tilt);
+
+                // 3D Fin Gradient matching Image 1
+                const grad = ctx.createLinearGradient(-rx, -ry, rx, ry);
+                grad.addColorStop(0, '#2A0800');
+                grad.addColorStop(0.42, '#9A2B0B');
+                grad.addColorStop(0.76, '#DC5621');
+                grad.addColorStop(1, '#FF9E44');
+
+                ctx.beginPath();
+                ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                // Bright Razor Rim Highlight
+                ctx.lineWidth = 1.4;
+                ctx.strokeStyle = 'rgba(255, 195, 120, 0.55)';
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(renderSlicedWave);
+        }
+        renderSlicedWave();
+
+        /* =========================================================================
+           2. HERO NLE TIMELINE INTERACTIVE PLAYHEAD SCRUBBER
+           ========================================================================= */
+        const nleBox = document.getElementById('hero-nle-timeline');
+        const playhead = document.getElementById('hero-playhead');
+        const timecodeEl = document.getElementById('nle-timecode');
+
+        if (nleBox && playhead && timecodeEl) {
+            nleBox.addEventListener('mousemove', (e) => {
+                const rect = nleBox.getBoundingClientRect();
+                const relX = Math.max(48, Math.min(rect.width - 24, e.clientX - rect.left));
+                const pct = (relX / rect.width) * 100;
+                playhead.style.left = `${pct}%`;
+
+                // Calculate dynamic timecode (00:00:00:00 to 00:00:12:24)
+                const totalFrames = Math.floor((pct / 100) * 12 * 24);
+                const secs = String(Math.floor(totalFrames / 24)).padStart(2, '0');
+                const frames = String(totalFrames % 24).padStart(2, '0');
+                timecodeEl.textContent = `00:00:${secs}:${frames}`;
+            });
+        }
+
+        /* =========================================================================
+           3. AFTER EFFECTS SWARM REBUILD ENGINE (1.5s Smooth Keyframe Construction)
            ========================================================================= */
         const SWARM_AGENTS = [
             { name: 'Director_AI', color: '#DC5621' },
@@ -797,7 +1215,6 @@
         let agentNodes = [];
         let hudTimeout;
 
-        // Create 6 reusable vector cursors in the overlay stage
         function initSwarmAgents() {
             swarmStage.innerHTML = '';
             agentNodes = SWARM_AGENTS.map(agent => {
@@ -809,7 +1226,6 @@
                     </svg>
                     <span class="swarm-agent-label" style="background:${agent.color}">${agent.name}</span>
                 `;
-                // Start from random edges
                 const startX = Math.random() * window.innerWidth;
                 const startY = Math.random() * window.innerHeight;
                 el.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
@@ -819,33 +1235,27 @@
         }
         initSwarmAgents();
 
-        // Trigger the 1.5-second Swarm Build on a group of elements
         function runSwarmOnElements(elements) {
             if (!elements || elements.length === 0) return;
 
-            // Show HUD & Smart Red Snap Guides
             swarmHud.classList.add('hud-active');
             snapLineV.style.opacity = '0.55';
             snapLineH.style.opacity = '0.4';
-
             clearTimeout(hudTimeout);
 
-            const totalDuration = 1500; // Strictly 1.5 seconds total
+            const totalDuration = 1500;
             const count = elements.length;
             const maxStagger = Math.min(360, count * 65);
 
-            // Activate Agent Cursors
             agentNodes.forEach(a => { a.el.style.opacity = '1'; });
 
             elements.forEach((el, idx) => {
                 const agent = agentNodes[idx % agentNodes.length];
                 const delay = count > 1 ? (idx / (count - 1)) * maxStagger : 0;
 
-                // Reset state
                 el.classList.remove('swarm-building', 'swarm-done');
                 el.style.opacity = '0';
 
-                // Set subtle directional keyframe offset
                 const offsetX = (idx % 2 === 0 ? -1 : 1) * (18 + (idx % 3) * 8);
                 const offsetY = 24;
                 el.style.setProperty('--sx', `${offsetX}px`);
@@ -857,18 +1267,15 @@
                     const w = Math.round(rect.width);
                     const h = Math.round(rect.height);
 
-                    // Fly agent cursor to target element corner/center
                     if (rect.top >= -100 && rect.top <= window.innerHeight + 100) {
                         const targetX = Math.max(20, Math.min(window.innerWidth - 110, rect.left + rect.width * 0.65));
                         const targetY = Math.max(20, Math.min(window.innerHeight - 40, rect.top + rect.height * 0.35));
                         agent.el.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(0.95)`;
 
-                        // Move red smart guide lines to snap center
                         snapLineV.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
                         snapLineH.style.top = `${Math.round(rect.top + rect.height / 2)}px`;
                     }
 
-                    // Inject temporary Figma/AE Bounding Box with 8 handles
                     const oldBox = el.querySelector('.swarm-box-overlay');
                     if (oldBox) oldBox.remove();
 
@@ -888,10 +1295,8 @@
                     `;
                     el.appendChild(box);
 
-                    // Trigger smooth 1.35s AE Easy-Ease keyframe animation
                     el.classList.add('swarm-building');
 
-                    // Clean up bounding box after keyframe finishes
                     setTimeout(() => {
                         if (box && box.parentNode) box.remove();
                         el.classList.remove('swarm-building');
@@ -901,7 +1306,6 @@
                 }, delay);
             });
 
-            // Scatter cursors out & hide HUD cleanly at 1.5s mark
             hudTimeout = setTimeout(() => {
                 agentNodes.forEach((a, i) => {
                     const exitX = (i % 2 === 0) ? -120 : window.innerWidth + 120;
@@ -915,7 +1319,6 @@
             }, totalDuration);
         }
 
-        // Observe sections so each section builds live in 1.5s when scrolled into view
         const animatedGroups = new Set();
         const sectionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -928,7 +1331,7 @@
                     }
                 }
             });
-        }, { threshold: 0.18 });
+        }, { threshold: 0.15 });
 
         window.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-swarm-group]').forEach(sec => {
@@ -936,7 +1339,6 @@
             });
         });
 
-        // Replay button handler to re-run the 1.5s Swarm animation on currently visible elements
         function replayVisibleSwarm() {
             const visibleEls = Array.from(document.querySelectorAll('[data-swarm]')).filter(el => {
                 const r = el.getBoundingClientRect();
@@ -946,7 +1348,7 @@
         }
 
         /* =========================================================================
-           2. WHATSAPP & DIRECT GMAIL HANDLERS
+           4. WHATSAPP & DIRECT GMAIL HANDLERS
            ========================================================================= */
         function sendToWhatsApp(e) {
             e.preventDefault();
@@ -966,7 +1368,7 @@
         }
 
         /* =========================================================================
-           3. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
+           5. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
            ========================================================================= */
         const cardWrappers = document.querySelectorAll('.card-3d-wrapper');
         cardWrappers.forEach(wrapper => {
@@ -1002,7 +1404,7 @@
         });
 
         /* =========================================================================
-           4. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
+           6. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
            ========================================================================= */
         const htmlEl = document.documentElement;
         const morphCircle = document.getElementById('theme-morph-circle');
@@ -1038,7 +1440,7 @@
         }
 
         /* =========================================================================
-           5. 3D INTERACTIVE CARTOON SMILEY CURSOR ENGINE
+           7. 3D INTERACTIVE CARTOON SMILEY CURSOR ENGINE
            ========================================================================= */
         const cursor = document.getElementById('smiley-cursor');
         const eyesOpen = document.getElementById('eyes-open');
