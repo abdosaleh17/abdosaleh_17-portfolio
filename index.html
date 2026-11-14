@@ -104,6 +104,171 @@
             animation: diamondFloat 3.2s ease-in-out infinite;
         }
 
+        /* =========================================================
+           AFTER EFFECTS SWARM REBUILD ENGINE (1.5s SMOOTH KEYFRAMES)
+           ========================================================= */
+        [data-swarm] {
+            opacity: 0;
+            will-change: transform, opacity, filter;
+        }
+
+        /* Smooth AE Easy-Ease Keyframe Animation (1.5s) */
+        @keyframes aeSwarmConstruct {
+            0% {
+                opacity: 0;
+                transform: translate3d(var(--sx, 0px), var(--sy, 28px), 0) scale(0.86);
+                filter: blur(8px);
+            }
+            28% {
+                opacity: 0.85;
+                filter: blur(1.5px);
+            }
+            72% {
+                opacity: 1;
+                transform: translate3d(calc(var(--sx, 0px) * -0.04), -2px, 0) scale(1.015);
+                filter: blur(0px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+                filter: blur(0px);
+            }
+        }
+
+        .swarm-building {
+            animation: aeSwarmConstruct 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
+
+        .swarm-done {
+            opacity: 1 !important;
+            transform: none;
+            filter: none;
+        }
+
+        /* Figma / AE Selection Bounding Box Overlay on Elements Being Built */
+        .swarm-box-overlay {
+            position: absolute;
+            inset: -5px;
+            border: 1.5px solid var(--swarm-color, #3B82F6);
+            background: rgba(59, 130, 246, 0.04);
+            pointer-events: none;
+            z-index: 45;
+            border-radius: 6px;
+            animation: boxFadeOut 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes boxFadeOut {
+            0% { opacity: 0; transform: scale(0.92); }
+            20% { opacity: 1; transform: scale(1); }
+            78% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* 8 Corner & Side Resize Handles */
+        .swarm-handle {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--swarm-color, #3B82F6);
+            border-radius: 1.5px;
+        }
+        .sh-tl { top: -4px; left: -4px; }
+        .sh-tr { top: -4px; right: -4px; }
+        .sh-bl { bottom: -4px; left: -4px; }
+        .sh-br { bottom: -4px; right: -4px; }
+        .sh-tm { top: -4px; left: calc(50% - 3.5px); }
+        .sh-bm { bottom: -4px; left: calc(50% - 3.5px); }
+        .sh-ml { top: calc(50% - 3.5px); left: -4px; }
+        .sh-mr { top: calc(50% - 3.5px); right: -4px; }
+
+        /* Dimension Pill Tag under Bounding Box */
+        .swarm-dim-tag {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--swarm-color, #3B82F6);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+        }
+
+        /* Flying Multiplayer Swarm Agent Cursors Layer */
+        #swarm-stage {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9990;
+            overflow: hidden;
+        }
+
+        .swarm-agent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+            opacity: 0;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+        }
+
+        .swarm-agent-label {
+            position: absolute;
+            left: 16px;
+            top: 14px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #FFFFFF;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Red Smart Alignment Snap Line (like Figma / AE) */
+        #swarm-snap-line-v, #swarm-snap-line-h {
+            position: fixed;
+            background: rgba(244, 63, 94, 0.65);
+            pointer-events: none;
+            z-index: 9985;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #swarm-snap-line-v {
+            top: 0; bottom: 0; width: 1px; left: 50%;
+            box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+        }
+        #swarm-snap-line-h {
+            left: 0; right: 0; height: 1px; top: 50%;
+            box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+        }
+
+        /* Bottom Swarm HUD Status Pill (Auto-hides after 1.5s) */
+        #swarm-hud {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 9995;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #swarm-hud.hud-active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* ==========================================
            3D PORTFOLIO CARDS + AMBIENT GLOW + FADE
            ========================================== */
@@ -120,24 +285,22 @@
             will-change: transform, opacity, filter;
         }
 
-        /* Idle subtle 3D floating motion when not hovered */
         @keyframes idleFloat {
             0%, 100% { transform: translateY(0px) rotateX(2deg) rotateY(-2deg); }
             50% { transform: translateY(-7px) rotateX(-2deg) rotateY(2deg); }
         }
-        .card-3d-wrapper:nth-child(1) { animation: idleFloat 5s ease-in-out infinite; }
-        .card-3d-wrapper:nth-child(2) { animation: idleFloat 5.6s ease-in-out infinite 0.6s; }
-        .card-3d-wrapper:nth-child(3) { animation: idleFloat 6.2s ease-in-out infinite 1.2s; }
+        .card-3d-wrapper.swarm-done:nth-child(1) { animation: idleFloat 5s ease-in-out infinite; }
+        .card-3d-wrapper.swarm-done:nth-child(2) { animation: idleFloat 5.6s ease-in-out infinite 0.6s; }
+        .card-3d-wrapper.swarm-done:nth-child(3) { animation: idleFloat 6.2s ease-in-out infinite 1.2s; }
 
-        /* Pause idle float when interacting with grid */
         .portfolio-grid:hover .card-3d-wrapper {
             animation-play-state: paused;
         }
 
         /* Sibling Fade & Depth Blur Effect when one card is hovered */
         .portfolio-grid:hover .card-3d-wrapper:not(:hover) {
-            opacity: 0.38;
-            filter: blur(2.5px) grayscale(35%);
+            opacity: 0.38 !important;
+            filter: blur(2.5px) grayscale(35%) !important;
             transform: scale(0.94) translateZ(-30px) !important;
         }
 
@@ -160,7 +323,6 @@
             transform: scale(1.08);
         }
 
-        /* Inner 3D Card Surface */
         .card-3d-surface {
             transform-style: preserve-3d;
             border: 1px solid rgba(220, 86, 33, 0.32);
@@ -175,7 +337,6 @@
                         inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
-        /* Pop-out 3D Elements inside card */
         .pop-3d-img {
             transform: translateZ(35px);
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -183,14 +344,8 @@
         .card-3d-wrapper:hover .pop-3d-img {
             transform: translateZ(55px) scale(1.03);
         }
-
-        .pop-3d-text {
-            transform: translateZ(25px);
-        }
-
-        .pop-3d-btn {
-            transform: translateZ(40px);
-        }
+        .pop-3d-text { transform: translateZ(25px); }
+        .pop-3d-btn { transform: translateZ(40px); }
 
         /* Morph Theme Ripple Overlay */
         #theme-morph-circle {
@@ -205,7 +360,6 @@
             transition: clip-path 0.75s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        /* Toggle Icon Morph Animation */
         .theme-icon-wrapper {
             position: relative;
             width: 24px;
@@ -269,6 +423,21 @@
     <!-- Morphing Theme Overlay -->
     <div id="theme-morph-circle"></div>
 
+    <!-- Swarm Rebuild Stage (Flying Multiplayer Cursors + Smart Snap Guides) -->
+    <div id="swarm-snap-line-v"></div>
+    <div id="swarm-snap-line-h"></div>
+    <div id="swarm-stage"></div>
+
+    <!-- Bottom Swarm HUD Pill (Shows during 1.5s build) -->
+    <div id="swarm-hud" class="glass px-4 py-2 rounded-full flex items-center gap-2.5 border border-brand/40 shadow-2xl">
+        <span class="flex gap-1">
+            <span class="w-2 h-2 rounded-full bg-brand animate-ping"></span>
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </span>
+        <span id="swarm-hud-text" class="text-[11px] font-extrabold tracking-wide uppercase">Swarm Agents Building UI • 1.5s</span>
+    </div>
+
     <!-- 3D Cartoon Interactive Smiley Cursor -->
     <div id="smiley-cursor">
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -307,8 +476,8 @@
     </div>
 
     <!-- Navbar -->
-    <header class="fixed top-0 w-full z-50 px-4 py-4">
-        <div class="max-w-6xl mx-auto glass rounded-2xl px-6 py-3 flex items-center justify-between">
+    <header class="fixed top-0 w-full z-50 px-4 py-4" data-swarm-group="hero">
+        <div data-swarm class="max-w-6xl mx-auto glass rounded-2xl px-6 py-3 flex items-center justify-between">
             <a href="#" class="text-xl font-black tracking-tight">ABDO <span class="text-brand">SALEH</span></a>
             
             <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-theme-muted">
@@ -318,7 +487,13 @@
                 <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="hover:text-brand transition">Instagram</a>
             </nav>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5">
+                <!-- Replay Swarm Animation Button -->
+                <button onclick="replayVisibleSwarm()" class="glass px-3 py-2 rounded-xl text-xs font-bold hover:border-brand transition flex items-center gap-1.5" title="Replay 1.5s Swarm Animation">
+                    <span class="text-brand">⚡</span>
+                    <span class="hidden sm:inline">Swarm</span>
+                </button>
+
                 <!-- Morphing Dark / Light Mode Toggle Button -->
                 <button id="theme-toggle" onclick="toggleTheme(event)" aria-label="Toggle Theme" class="glass p-2.5 rounded-xl hover:border-brand transition flex items-center justify-center" title="Switch Light / Dark Mode">
                     <div class="theme-icon-wrapper">
@@ -347,14 +522,16 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="pt-36 pb-20 px-4 text-center relative overflow-hidden">
+    <section class="pt-36 pb-20 px-4 text-center relative overflow-hidden" data-swarm-group="hero">
         <div class="max-w-4xl mx-auto">
-            <span class="inline-block px-4 py-1.5 rounded-full glass text-brand text-xs font-bold uppercase tracking-widest mb-6">
-                Video Editor • Videographer • AI Visual Director
-            </span>
+            <div data-swarm class="inline-block mb-6">
+                <span class="inline-block px-4 py-1.5 rounded-full glass text-brand text-xs font-bold uppercase tracking-widest">
+                    Video Editor • Videographer • AI Visual Director
+                </span>
+            </div>
             
-            <!-- Updated Hero Headline: 🔸 Editing how people feel. -->
-            <h1 class="text-4xl md:text-7xl font-black leading-tight mb-6 flex items-center justify-center flex-wrap gap-3 md:gap-4 tracking-tight">
+            <!-- Hero Headline: 🔸 Editing how people feel. -->
+            <h1 data-swarm class="text-4xl md:text-7xl font-black leading-tight mb-6 flex items-center justify-center flex-wrap gap-3 md:gap-4 tracking-tight">
                 <span class="diamond-3d" aria-hidden="true">
                     <svg class="w-9 h-9 md:w-14 md:h-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -375,10 +552,10 @@
                 <span>Editing <span class="gradient-text">how people feel.</span></span>
             </h1>
 
-            <p class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
+            <p data-swarm class="text-theme-muted text-base md:text-lg max-w-2xl mx-auto mb-10">
                 Transforming ideas into cinematic stories, viral educational promos, and next-gen AI commercials for top instructors and brands across Egypt & the MENA region.
             </p>
-            <div class="flex flex-wrap justify-center gap-4">
+            <div data-swarm class="flex flex-wrap justify-center gap-4">
                 <a href="#portfolio" class="bg-brand hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg">
                     Explore My Work
                 </a>
@@ -390,9 +567,9 @@
     </section>
 
     <!-- Portfolio Categories Section (Interactive 3D Cards + Backlight Glow + Spotlight Fade) -->
-    <section id="portfolio" class="py-20 px-4">
+    <section id="portfolio" class="py-20 px-4" data-swarm-group="portfolio">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
+            <div data-swarm class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">Featured <span class="gradient-text">Portfolio</span></h2>
                 <p class="text-theme-muted">Hover to inspect in 3D • Click any card to explore full projects on Google Drive</p>
             </div>
@@ -400,7 +577,7 @@
             <div class="portfolio-grid grid grid-cols-1 md:grid-cols-3 gap-10">
                 
                 <!-- Card 1: Commercial Edits -->
-                <div class="card-3d-wrapper">
+                <div data-swarm class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1vB8Ii4RROFm3mtAcQOpeEPGvkdO3GWp9" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -419,7 +596,7 @@
                 </div>
 
                 <!-- Card 2: AI Commercials -->
-                <div class="card-3d-wrapper">
+                <div data-swarm class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1zTOmqPmZyX603gBBqxJ2WwJpB4uAv5A7?usp=drive_link" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -438,7 +615,7 @@
                 </div>
 
                 <!-- Card 3: Thumbnails & Posters -->
-                <div class="card-3d-wrapper">
+                <div data-swarm class="card-3d-wrapper">
                     <div class="card-ambient-glow"></div>
                     <a href="https://drive.google.com/drive/folders/1kiEmzAFCUC1QALm0EoUC6gb92srLGpzH?usp=sharing" target="_blank" rel="noopener noreferrer" class="card-3d-surface glass rounded-3xl p-6 flex flex-col h-full block">
                         <div class="pop-3d-img w-full aspect-square rounded-2xl overflow-hidden mb-6 bg-black shadow-2xl">
@@ -461,16 +638,16 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section id="testimonials" class="py-20 px-4 sec-bg" dir="rtl">
+    <section id="testimonials" class="py-20 px-4 sec-bg" dir="rtl" data-swarm-group="testimonials">
         <div class="max-w-6xl mx-auto font-arabic">
-            <div class="text-center mb-14">
+            <div data-swarm class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-3">آراء وتقييمات <span class="gradient-text">شركاء النجاح</span></h2>
                 <p class="text-theme-muted">ثقة نخبة من المحاضرين، الأطباء، وأصحاب العلامات التجارية في مصر والعالم العربي</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Client 1: Eng. Mohamed Zain -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شغل احترافي فوق الوصف في بناء الهوية البصرية الكاملة لبراند عسل زين، من تصميم الاستيكرز والموك أب لحد الإعلانات والريلز التجارية. عبد الرحمن فاهم يعني إيه يطلع المنتج بشكل فخم يبيع من أول نظرة."
@@ -482,7 +659,7 @@
                 </div>
 
                 <!-- Client 2: Dr. Murtadha Al-Salami -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "إبداع حقيقي في إخراج الهوية البصرية والفيديوهات الخاصة بمنصة أثر (Athar) الطبية. دمج الموشن جرافيك مع الـ 3D والـ AI نقل شكل المنصة لمستوى عالمي ومميز جداً في العراق."
@@ -494,7 +671,7 @@
                 </div>
 
                 <!-- Client 3: Mr. Mohamed Sharaf -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شريك النجاح في مشروع (مصطبة التاريخ). عبد الرحمن مش مجرد مونتير، هو مخرج فاهم روح المادة العلمية وبيحول المحاضرات والبروموهات لعمل سينمائي وتصميمات بتشد الطالب من أول ثانية."
@@ -506,7 +683,7 @@
                 </div>
 
                 <!-- Client 4: Mr. Belal El-Shaer -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "تغطية وتصوير السنتر مع المونتاج السريع والاحترافي فرقوا جداً في إبراز تفاعل الطلاب وقوة الشرح. كواليتي الكاميرا والإضاءة وتقطيع الريلز دايماً في الموعد وبأعلى جودة."
@@ -518,7 +695,7 @@
                 </div>
 
                 <!-- Client 5: Mr. Ahmed El-Falala -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "إعلان حجز الدروس في بداية السنة كان ضربة معلم! الفكرة وتنفيذ الفيديو خطفوا انتباه الطلاب وأولياء الأمور وحققوا تفاعل وحجوزات ممتازة من أول يوم نشر."
@@ -530,7 +707,7 @@
                 </div>
 
                 <!-- Client 6: Mr. El-Saeedy -->
-                <div class="glass rounded-3xl p-6 glow-hover transition">
+                <div data-swarm class="glass rounded-3xl p-6 glow-hover transition">
                     <div class="text-brand text-xl mb-3">★★★★★</div>
                     <p class="text-theme-muted text-sm leading-relaxed mb-6">
                         "شغل جبار في حملة الانطلاقة الجديدة للعام الدراسي 2026، سواء في تصوير السنتر أو إعلانات المنصة أونلاين. الفيديو عكس قوة النظام الجديد ووصل الرسالة للطلبة بأقوى شكل بصري."
@@ -545,8 +722,8 @@
     </section>
 
     <!-- Contact & Booking Section -->
-    <section id="contact" class="py-20 px-4">
-        <div class="max-w-4xl mx-auto glass rounded-3xl p-8 md:p-12">
+    <section id="contact" class="py-20 px-4" data-swarm-group="contact">
+        <div data-swarm class="max-w-4xl mx-auto glass rounded-3xl p-8 md:p-12">
             <div class="text-center mb-10">
                 <h2 class="text-3xl md:text-4xl font-black mb-3">Ready to Start Your <span class="gradient-text">Next Project?</span></h2>
                 <p class="text-theme-muted">Send your project details directly via WhatsApp, Instagram, or Gmail Inbox</p>
@@ -599,9 +776,178 @@
         </div>
     </footer>
 
-    <!-- Interactive Scripts: WhatsApp, Direct Gmail, 3D Cards Tilt, Morph Theme & 3D Smiley Cursor -->
+    <!-- Interactive Scripts: Swarm Rebuild Engine, WhatsApp, Direct Gmail, 3D Cards, Theme & Smiley Cursor -->
     <script>
-        // 1. WhatsApp Direct Form Handler
+        /* =========================================================================
+           1. AFTER EFFECTS SWARM REBUILD ENGINE (1.5s Smooth Keyframe Construction)
+           ========================================================================= */
+        const SWARM_AGENTS = [
+            { name: 'Director_AI', color: '#DC5621' },
+            { name: 'Motion_Key',  color: '#3B82F6' },
+            { name: 'VFX_Node',    color: '#10B981' },
+            { name: 'Color_Lab',   color: '#A855F7' },
+            { name: 'Jimmy_3D',    color: '#F59E0B' },
+            { name: 'Edit_Pro',    color: '#EC4899' }
+        ];
+
+        const swarmStage = document.getElementById('swarm-stage');
+        const snapLineV = document.getElementById('swarm-snap-line-v');
+        const snapLineH = document.getElementById('swarm-snap-line-h');
+        const swarmHud = document.getElementById('swarm-hud');
+        let agentNodes = [];
+        let hudTimeout;
+
+        // Create 6 reusable vector cursors in the overlay stage
+        function initSwarmAgents() {
+            swarmStage.innerHTML = '';
+            agentNodes = SWARM_AGENTS.map(agent => {
+                const el = document.createElement('div');
+                el.className = 'swarm-agent';
+                el.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 3L10.5 20.5L13.5 13.5L20.5 10.5L3 3Z" fill="${agent.color}" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="swarm-agent-label" style="background:${agent.color}">${agent.name}</span>
+                `;
+                // Start from random edges
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                el.style.transform = `translate3d(${startX}px, ${startY}px, 0)`;
+                swarmStage.appendChild(el);
+                return { el, ...agent };
+            });
+        }
+        initSwarmAgents();
+
+        // Trigger the 1.5-second Swarm Build on a group of elements
+        function runSwarmOnElements(elements) {
+            if (!elements || elements.length === 0) return;
+
+            // Show HUD & Smart Red Snap Guides
+            swarmHud.classList.add('hud-active');
+            snapLineV.style.opacity = '0.55';
+            snapLineH.style.opacity = '0.4';
+
+            clearTimeout(hudTimeout);
+
+            const totalDuration = 1500; // Strictly 1.5 seconds total
+            const count = elements.length;
+            const maxStagger = Math.min(360, count * 65);
+
+            // Activate Agent Cursors
+            agentNodes.forEach(a => { a.el.style.opacity = '1'; });
+
+            elements.forEach((el, idx) => {
+                const agent = agentNodes[idx % agentNodes.length];
+                const delay = count > 1 ? (idx / (count - 1)) * maxStagger : 0;
+
+                // Reset state
+                el.classList.remove('swarm-building', 'swarm-done');
+                el.style.opacity = '0';
+
+                // Set subtle directional keyframe offset
+                const offsetX = (idx % 2 === 0 ? -1 : 1) * (18 + (idx % 3) * 8);
+                const offsetY = 24;
+                el.style.setProperty('--sx', `${offsetX}px`);
+                el.style.setProperty('--sy', `${offsetY}px`);
+                el.style.setProperty('--swarm-color', agent.color);
+
+                setTimeout(() => {
+                    const rect = el.getBoundingClientRect();
+                    const w = Math.round(rect.width);
+                    const h = Math.round(rect.height);
+
+                    // Fly agent cursor to target element corner/center
+                    if (rect.top >= -100 && rect.top <= window.innerHeight + 100) {
+                        const targetX = Math.max(20, Math.min(window.innerWidth - 110, rect.left + rect.width * 0.65));
+                        const targetY = Math.max(20, Math.min(window.innerHeight - 40, rect.top + rect.height * 0.35));
+                        agent.el.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(0.95)`;
+
+                        // Move red smart guide lines to snap center
+                        snapLineV.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
+                        snapLineH.style.top = `${Math.round(rect.top + rect.height / 2)}px`;
+                    }
+
+                    // Inject temporary Figma/AE Bounding Box with 8 handles
+                    const oldBox = el.querySelector('.swarm-box-overlay');
+                    if (oldBox) oldBox.remove();
+
+                    const box = document.createElement('div');
+                    box.className = 'swarm-box-overlay';
+                    box.style.setProperty('--swarm-color', agent.color);
+                    box.innerHTML = `
+                        <span class="swarm-handle sh-tl"></span>
+                        <span class="swarm-handle sh-tr"></span>
+                        <span class="swarm-handle sh-bl"></span>
+                        <span class="swarm-handle sh-br"></span>
+                        <span class="swarm-handle sh-tm"></span>
+                        <span class="swarm-handle sh-bm"></span>
+                        <span class="swarm-handle sh-ml"></span>
+                        <span class="swarm-handle sh-mr"></span>
+                        <span class="swarm-dim-tag">${w} × ${h}</span>
+                    `;
+                    el.appendChild(box);
+
+                    // Trigger smooth 1.35s AE Easy-Ease keyframe animation
+                    el.classList.add('swarm-building');
+
+                    // Clean up bounding box after keyframe finishes
+                    setTimeout(() => {
+                        if (box && box.parentNode) box.remove();
+                        el.classList.remove('swarm-building');
+                        el.classList.add('swarm-done');
+                    }, 1350);
+
+                }, delay);
+            });
+
+            // Scatter cursors out & hide HUD cleanly at 1.5s mark
+            hudTimeout = setTimeout(() => {
+                agentNodes.forEach((a, i) => {
+                    const exitX = (i % 2 === 0) ? -120 : window.innerWidth + 120;
+                    const exitY = (i * 140) % window.innerHeight;
+                    a.el.style.transform = `translate3d(${exitX}px, ${exitY}px, 0)`;
+                    a.el.style.opacity = '0';
+                });
+                snapLineV.style.opacity = '0';
+                snapLineH.style.opacity = '0';
+                swarmHud.classList.remove('hud-active');
+            }, totalDuration);
+        }
+
+        // Observe sections so each section builds live in 1.5s when scrolled into view
+        const animatedGroups = new Set();
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const groupName = entry.target.getAttribute('data-swarm-group');
+                    if (!animatedGroups.has(groupName)) {
+                        animatedGroups.add(groupName);
+                        const groupEls = document.querySelectorAll(`[data-swarm-group="${groupName}"] [data-swarm]`);
+                        runSwarmOnElements(Array.from(groupEls));
+                    }
+                }
+            });
+        }, { threshold: 0.18 });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-swarm-group]').forEach(sec => {
+                sectionObserver.observe(sec);
+            });
+        });
+
+        // Replay button handler to re-run the 1.5s Swarm animation on currently visible elements
+        function replayVisibleSwarm() {
+            const visibleEls = Array.from(document.querySelectorAll('[data-swarm]')).filter(el => {
+                const r = el.getBoundingClientRect();
+                return r.bottom > 0 && r.top < window.innerHeight;
+            });
+            runSwarmOnElements(visibleEls);
+        }
+
+        /* =========================================================================
+           2. WHATSAPP & DIRECT GMAIL HANDLERS
+           ========================================================================= */
         function sendToWhatsApp(e) {
             e.preventDefault();
             const name = document.getElementById('clientName').value;
@@ -611,18 +957,17 @@
             window.open(`https://wa.me/201552757725?text=${msg}`, '_blank');
         }
 
-        // 2. Smart Direct Gmail Compose Opener (Works on Desktop Web & Mobile Gmail App)
         function openGmailDirect(e) {
             const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             if (isMobile) {
-                // On mobile, trigger native mail/Gmail app composer directly
                 e.preventDefault();
                 window.location.href = "mailto:abdomsaleh90@gmail.com?subject=Project%20Inquiry%20-%20Abdo%20Saleh";
             }
-            // On desktop, the default href opens https://mail.google.com/mail/?view=cm&fs=1&to=abdomsaleh90@gmail.com in a new tab
         }
 
-        // 3. Interactive 3D Card Perspective Tilt Engine
+        /* =========================================================================
+           3. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
+           ========================================================================= */
         const cardWrappers = document.querySelectorAll('.card-3d-wrapper');
         cardWrappers.forEach(wrapper => {
             const glow = wrapper.querySelector('.card-ambient-glow');
@@ -634,14 +979,12 @@
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
 
-                // Calculate smooth 3D rotation angles (max 14 deg)
                 const rotateX = ((y - centerY) / centerY) * -14;
                 const rotateY = ((x - centerX) / centerX) * 14;
 
                 wrapper.style.transition = 'transform 0.08s ease-out, opacity 0.4s ease, filter 0.4s ease';
                 wrapper.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`;
 
-                // Shift backlight glow dynamically with mouse
                 if (glow) {
                     const glowX = ((x - centerX) / centerX) * 18;
                     const glowY = ((y - centerY) / centerY) * 18;
@@ -658,7 +1001,9 @@
             });
         });
 
-        // 4. Smooth Morph Dark / Light Theme Switcher
+        /* =========================================================================
+           4. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
+           ========================================================================= */
         const htmlEl = document.documentElement;
         const morphCircle = document.getElementById('theme-morph-circle');
 
@@ -692,7 +1037,9 @@
             });
         }
 
-        // 5. 3D Interactive Cartoon Smiley Cursor Engine
+        /* =========================================================================
+           5. 3D INTERACTIVE CARTOON SMILEY CURSOR ENGINE
+           ========================================================================= */
         const cursor = document.getElementById('smiley-cursor');
         const eyesOpen = document.getElementById('eyes-open');
         const eyesBlink = document.getElementById('eyes-blink');
