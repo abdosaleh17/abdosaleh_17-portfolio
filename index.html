@@ -13,7 +13,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FF922B'/%3E%3Cstop offset='100%25' stop-color='%23DC5621'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23121212' stroke='url(%23g)' stroke-width='6'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-weight='900' font-size='48' fill='url(%23g)'%3EAS%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -75,6 +75,151 @@
             overflow-x: hidden;
         }
 
+        /* =========================================================================
+           DHIKR NOTIFICATION TOAST ("صلِّ على محمد") - IMAGES 1 & 2 HYBRID STYLE
+           ========================================================================= */
+        #dhikr-toast-container {
+            position: fixed;
+            top: 82px;
+            left: 50%;
+            transform: translate3d(-50%, -140px, 0) scale(0.85);
+            opacity: 0;
+            z-index: 9990;
+            pointer-events: none;
+            transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        #dhikr-toast-container.dhikr-visible {
+            transform: translate3d(-50%, 0, 0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Subtle Floating & Breathing Motion while visible */
+        @keyframes dhikrFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-4px) scale(1.02); }
+        }
+
+        .dhikr-float-wrapper {
+            position: relative;
+            animation: dhikrFloat 2.4s ease-in-out infinite;
+            cursor: pointer !important;
+        }
+
+        /* Ambient Backlight Glow behind the notification */
+        .dhikr-ambient-glow {
+            position: absolute;
+            inset: -14px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(220, 86, 33, 0.75) 0%, rgba(255, 146, 43, 0.4) 45%, transparent 75%);
+            filter: blur(18px);
+            z-index: -1;
+            animation: dhikrGlowPulse 1.8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes dhikrGlowPulse {
+            0% { opacity: 0.65; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.08); }
+        }
+
+        /* Outer Glass Shell (Inspired by Image 1 Frame & Image 2 Dark Capsule) */
+        .dhikr-outer-shell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 10px 7px 8px;
+            border-radius: 9999px;
+            background: rgba(20, 20, 22, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+        }
+
+        html:not(.dark) .dhikr-outer-shell {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1.5px solid rgba(220, 86, 33, 0.3);
+            box-shadow: 0 18px 35px rgba(220, 86, 33, 0.22),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Iridescent / Brand Glowing Icon Circle (Inspired by Image 2) */
+        .dhikr-icon-orb {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #18181B;
+            z-index: 1;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Spinning Chromatic/Brand Ring on the Orb Edge */
+        .dhikr-icon-orb::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 10%, #FFE066, #FF922B, #DC5621, #38BDF8, transparent 85%);
+            animation: orbRingSpin 2.5s linear infinite;
+            z-index: -1;
+        }
+
+        .dhikr-icon-orb::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #2D2D35, #121214);
+            z-index: -1;
+        }
+
+        @keyframes orbRingSpin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 3D Glossy Jelly Pill Button Inside (Inspired by Image 1 Green Submit Pill, Styled in Brand Orange) */
+        .dhikr-3d-jelly-pill {
+            position: relative;
+            padding: 7px 22px;
+            border-radius: 9999px;
+            background: linear-gradient(180deg, #FF9E44 0%, #DC5621 55%, #B83B0E 100%);
+            color: #FFFFFF;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+            box-shadow: 0 6px 16px rgba(220, 86, 33, 0.55),
+                        inset 0 2px 2px rgba(255, 255, 255, 0.75),
+                        inset 0 -3px 6px rgba(100, 25, 0, 0.6);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Top Glass Specular Reflection Line (Image 1 Jelly Look) */
+        .dhikr-3d-jelly-pill::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 10%;
+            right: 10%;
+            height: 38%;
+            border-radius: 9999px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.0) 100%);
+            pointer-events: none;
+        }
+
         /* =========================================================
            HERO PROFILE AVATAR -> NAVBAR TOP-LEFT DOCKING ANIMATION
            ========================================================= */
@@ -100,7 +245,6 @@
             will-change: transform, opacity;
         }
 
-        /* When user scrolls down, hero avatar shrinks & docks toward top-left navbar */
         #hero-profile-wrapper.docked-to-nav {
             transform: translate3d(-28vw, -130px, 0) scale(0.28);
             opacity: 0;
@@ -108,7 +252,6 @@
             pointer-events: none;
         }
 
-        /* Top-Left Navbar Fixed Profile Avatar */
         #nav-profile-avatar {
             transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
         }
@@ -556,6 +699,33 @@
 </head>
 <body class="font-sans antialiased selection:bg-brand selection:text-white">
 
+    <!-- =========================================================================
+         TOP-CENTER PERIODIC DHIKR NOTIFICATION ("صلِّ على محمد")
+         Appears every 10 seconds for 3 seconds with 3D Jelly Pill & Chromatic Orb
+         ========================================================================= -->
+    <div id="dhikr-toast-container" role="status" aria-live="polite">
+        <div class="dhikr-float-wrapper" onclick="hideDhikrToast()" title="اللهم صلِّ وسلم على نبينا محمد">
+            <!-- Backlight Glow -->
+            <div class="dhikr-ambient-glow"></div>
+            
+            <!-- Outer Glass Capsule (Merging Image 1 & Image 2 Aesthetics) -->
+            <div class="dhikr-outer-shell" dir="rtl">
+                <!-- Glowing Rotating Ring Icon Orb (Image 2 style) -->
+                <div class="dhikr-icon-orb">
+                    <span class="text-amber-400 text-base select-none">✨</span>
+                </div>
+
+                <!-- 3D Glossy Jelly Pill (Image 1 Submit Button style in Brand Orange) -->
+                <div class="dhikr-3d-jelly-pill">
+                    <span>صلِّ على محمد ﷺ</span>
+                </div>
+
+                <!-- Subtle Close Indicator from Image 1 -->
+                <span class="text-xs text-gray-400 hover:text-white px-1.5 font-mono select-none">✕</span>
+            </div>
+        </div>
+    </div>
+
     <!-- MASTER FULL-SCREEN NLE TIMELINE INTRO -->
     <div id="master-timeline-intro" aria-hidden="true">
         <div id="master-intro-playhead"></div>
@@ -638,7 +808,6 @@
             <a href="#" class="flex items-center gap-3 group">
                 <div id="nav-profile-avatar" class="relative w-11 h-11 rounded-full p-[2px] profile-ring-glow shrink-0">
                     <img src="abdo.jpg" data-fallback-idx="0" onerror="resolveProfileImg(this)" alt="Abdo Saleh" class="w-full h-full rounded-full abdo-portrait-crop bg-zinc-900">
-                    <!-- Online Status Dot -->
                     <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-black"></span>
                 </div>
                 <div class="flex flex-col leading-none">
@@ -1203,7 +1372,37 @@
     <!-- Interactive Scripts -->
     <script>
         /* =========================================================================
-           0. SMART PROFILE IMAGE RESOLVER (Tries abdo.jpg -> abdo.jpeg -> profile.*)
+           0. PERIODIC DHIKR NOTIFICATION ENGINE (Every 10s -> Shows for 3s)
+           ========================================================================= */
+        const dhikrToast = document.getElementById('dhikr-toast-container');
+        let dhikrHideTimeout;
+
+        function showDhikrToast() {
+            if (!dhikrToast) return;
+            dhikrToast.classList.add('dhikr-visible');
+            clearTimeout(dhikrHideTimeout);
+            // Hide automatically after 3 seconds (3000ms)
+            dhikrHideTimeout = setTimeout(() => {
+                dhikrToast.classList.remove('dhikr-visible');
+            }, 3000);
+        }
+
+        function hideDhikrToast() {
+            if (!dhikrToast) return;
+            clearTimeout(dhikrHideTimeout);
+            dhikrToast.classList.remove('dhikr-visible');
+        }
+
+        // First appearance right after the 1.5s intro finishes (at 2.5s), then strictly every 10 seconds
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                showDhikrToast();
+                setInterval(showDhikrToast, 10000);
+            }, 2500);
+        });
+
+        /* =========================================================================
+           1. SMART PROFILE IMAGE RESOLVER (Tries abdo.jpg -> abdo.jpeg -> profile.*)
            ========================================================================= */
         const PROFILE_FALLBACKS = [
             'abdo.jpeg',
@@ -1238,7 +1437,7 @@
         }, { passive: true });
 
         /* =========================================================================
-           1. FULL-SCREEN & SECTION TIMELINE BUILD ENGINE (1.5s Fast Start -> Fade to UI)
+           2. FULL-SCREEN & SECTION TIMELINE BUILD ENGINE (1.5s Fast Start -> Fade to UI)
            ========================================================================= */
         const masterIntro = document.getElementById('master-timeline-intro');
 
@@ -1346,7 +1545,7 @@
         });
 
         /* =========================================================================
-           2. 3D SLICED RIBBON WAVE ENGINE (30% Width, Moves with Scroll)
+           3. 3D SLICED RIBBON WAVE ENGINE (30% Width, Moves with Scroll)
            ========================================================================= */
         const waveCanvas = document.getElementById('scroll-wave-canvas');
         const ctx = waveCanvas.getContext('2d');
@@ -1415,7 +1614,7 @@
         renderSlicedWave();
 
         /* =========================================================================
-           3. HERO NLE TIMELINE INTERACTIVE PLAYHEAD SCRUBBER
+           4. HERO NLE TIMELINE INTERACTIVE PLAYHEAD SCRUBBER
            ========================================================================= */
         const nleBox = document.getElementById('hero-nle-timeline');
         const playhead = document.getElementById('hero-playhead');
@@ -1436,7 +1635,7 @@
         }
 
         /* =========================================================================
-           4. WHATSAPP & DIRECT GMAIL HANDLERS
+           5. WHATSAPP & DIRECT GMAIL HANDLERS
            ========================================================================= */
         function sendToWhatsApp(e) {
             e.preventDefault();
@@ -1456,7 +1655,7 @@
         }
 
         /* =========================================================================
-           5. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
+           6. INTERACTIVE 3D CARD PERSPECTIVE TILT ENGINE
            ========================================================================= */
         const cardWrappers = document.querySelectorAll('.card-3d-wrapper');
         cardWrappers.forEach(wrapper => {
@@ -1492,7 +1691,7 @@
         });
 
         /* =========================================================================
-           6. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
+           7. SMOOTH MORPH DARK / LIGHT THEME SWITCHER
            ========================================================================= */
         const htmlEl = document.documentElement;
         const morphCircle = document.getElementById('theme-morph-circle');
