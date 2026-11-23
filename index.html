@@ -225,9 +225,9 @@
             pointer-events: none;
         }
 
-        /* =========================================================
+        /* =========================================================================
            HERO PROFILE AVATAR -> NAVBAR TOP-LEFT DOCKING ANIMATION
-           ========================================================= */
+           ========================================================================= */
         .profile-ring-glow {
             background: linear-gradient(135deg, #FFE066, #FF922B, #DC5621, #9A1B0B);
             background-size: 200% 200%;
@@ -437,7 +437,7 @@
         }
 
         /* =========================================================================
-           3D 3-CARD COVERFLOW FAN CAROUSEL FOR PORTFOLIO (EXACT REFERENCE FORMATION)
+           3D 3-CARD COVERFLOW FAN CAROUSEL (MOUSE HOVER + CLICK + ARROWS)
            ========================================================================= */
         .coverflow-stage {
             position: relative;
@@ -464,10 +464,10 @@
             border-radius: 28px;
             overflow: hidden;
             transform-style: preserve-3d;
-            transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-                        opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-                        filter 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-                        box-shadow 0.65s ease,
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                        filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.6s ease,
                         border-color 0.4s ease;
             border: 2px solid rgba(255, 255, 255, 0.2);
             background: #141416;
@@ -501,7 +501,6 @@
             transform: scale(1.05);
         }
 
-        /* Top-Left Number Badge inside each Coverflow Card (01, 02, 03) */
         .cf-card-num {
             position: absolute;
             top: 14px;
@@ -518,7 +517,6 @@
             z-index: 10;
         }
 
-        /* Bottom Gradient Overlay inside Card */
         .cf-card-overlay {
             position: absolute;
             inset: 0;
@@ -530,7 +528,6 @@
             text-align: left;
         }
 
-        /* Circular Arrow Buttons below Coverflow (Matching Reference Image) */
         .cf-arrow-btn {
             width: 52px;
             height: 52px;
@@ -561,6 +558,21 @@
 
         .cf-arrow-btn:active {
             transform: scale(0.94);
+        }
+
+        /* 3 Interactive Indicator Dots */
+        .cf-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 999px;
+            background: rgba(156, 163, 175, 0.35);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer !important;
+        }
+        .cf-dot.dot-active {
+            width: 28px;
+            background: linear-gradient(90deg, #FF922B, #DC5621);
+            box-shadow: 0 0 12px rgba(220, 86, 33, 0.7);
         }
 
         /* 2. INTERACTIVE NLE NAVIGATION TIMELINE UI */
@@ -681,14 +693,10 @@
 </head>
 <body class="font-sans antialiased selection:bg-brand selection:text-white">
 
-    <!-- =========================================================================
-         BRAND GLOW CURSOR TRAIL CANVAS (Native Mouse + Disappearing Orange Tail)
-         ========================================================================= -->
+    <!-- BRAND GLOW CURSOR TRAIL CANVAS -->
     <canvas id="cursor-trail-canvas" aria-hidden="true"></canvas>
 
-    <!-- =========================================================================
-         TOP-CENTER PERIODIC DHIKR NOTIFICATION ("صلِّ على محمد")
-         ========================================================================= -->
+    <!-- TOP-CENTER PERIODIC DHIKR NOTIFICATION ("صلِّ على محمد") -->
     <div id="dhikr-toast-container" role="status" aria-live="polite">
         <div class="dhikr-float-wrapper" onclick="hideDhikrToast()" title="اللهم صلِّ وسلم على نبينا محمد">
             <div class="dhikr-ambient-glow"></div>
@@ -704,9 +712,7 @@
         </div>
     </div>
 
-    <!-- =========================================================================
-         1-SECOND INITIAL FULL-SCREEN NLE TIMELINE INTRO ONLY (NO SECTION REPEAT)
-         ========================================================================= -->
+    <!-- 1-SECOND INITIAL FULL-SCREEN NLE TIMELINE INTRO -->
     <div id="master-timeline-intro" aria-hidden="true">
         <div id="master-intro-playhead"></div>
 
@@ -774,17 +780,15 @@
         </div>
     </div>
 
-    <!-- 1. 3D SLICED RIBBON WAVE BACKGROUND (30% Width, Moves with Scroll Down) -->
+    <!-- 3D SLICED RIBBON WAVE BACKGROUND -->
     <canvas id="scroll-wave-canvas" aria-hidden="true"></canvas>
 
     <!-- Morphing Theme Overlay -->
     <div id="theme-morph-circle"></div>
 
-    <!-- Navbar (With Fixed Top-Left Profile Photo + Name) -->
+    <!-- Navbar -->
     <header class="fixed top-0 w-full z-50 px-4 py-4">
         <div class="max-w-6xl mx-auto glass rounded-2xl px-5 py-2.5 flex items-center justify-between">
-            
-            <!-- Top-Left Fixed Profile Avatar + Brand Name -->
             <a href="#" class="flex items-center gap-3 group">
                 <div id="nav-profile-avatar" class="relative w-11 h-11 rounded-full p-[2px] profile-ring-glow shrink-0">
                     <img src="abdo.jpg" data-fallback-idx="0" onerror="resolveProfileImg(this)" alt="Abdo Saleh" class="w-full h-full rounded-full abdo-portrait-crop bg-zinc-900">
@@ -837,11 +841,11 @@
         </div>
     </header>
 
-    <!-- Hero Section + Featured Profile Showcase + Interactive Navigation Timeline -->
+    <!-- Hero Section -->
     <section class="pt-32 pb-16 px-4 text-center relative overflow-hidden">
         <div class="max-w-4xl mx-auto">
 
-            <!-- Hero Centerpiece Profile Photo (Docks into Top-Left Navbar on Scroll) -->
+            <!-- Hero Centerpiece Profile Photo -->
             <div id="hero-profile-wrapper" class="flex flex-col items-center justify-center mb-6">
                 <div class="relative w-32 h-32 md:w-40 md:h-40 rounded-full p-1.5 profile-ring-glow mb-3 transition-transform duration-300 hover:scale-105">
                     <img src="abdo.jpg" data-fallback-idx="0" onerror="resolveProfileImg(this)" alt="Abdo Saleh Profile" class="w-full h-full rounded-full abdo-portrait-crop bg-zinc-900 border-2 border-black/50 shadow-2xl">
@@ -857,7 +861,7 @@
                 </span>
             </div>
             
-            <!-- Hero Headline: 🔸 Editing how people feel. -->
+            <!-- Hero Headline -->
             <h1 class="text-4xl md:text-7xl font-black leading-tight mb-6 flex items-center justify-center flex-wrap gap-3 md:gap-4 tracking-tight">
                 <span class="diamond-3d" aria-hidden="true">
                     <svg class="w-9 h-9 md:w-14 md:h-14" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -914,7 +918,6 @@
                         <span>00:00</span><span>00:02</span><span>00:04</span><span>00:06</span><span>00:08</span><span>00:10</span><span>00:12</span>
                     </div>
 
-                    <!-- Track V3 -> Jumps to #portfolio -->
                     <a href="#portfolio" class="nle-nav-track group">
                         <span class="w-8 text-[11px] font-mono font-bold text-theme-muted group-hover:text-brand">V3</span>
                         <div class="flex-1 flex items-center gap-2.5 pl-[4%]">
@@ -926,7 +929,6 @@
                         </div>
                     </a>
 
-                    <!-- Track V2 -> Jumps to #experience -->
                     <a href="#experience" class="nle-nav-track group">
                         <span class="w-8 text-[11px] font-mono font-bold text-theme-muted group-hover:text-brand">V2</span>
                         <div class="flex-1 flex items-center gap-2.5 pl-[14%]">
@@ -938,7 +940,6 @@
                         </div>
                     </a>
 
-                    <!-- Track V1 -> Jumps to #testimonials -->
                     <a href="#testimonials" class="nle-nav-track group">
                         <span class="w-8 text-[11px] font-mono font-bold text-theme-muted group-hover:text-brand">V1</span>
                         <div class="flex-1 flex items-center gap-2.5 pl-[8%]">
@@ -950,7 +951,6 @@
                         </div>
                     </a>
 
-                    <!-- Track A1 -> Jumps to #contact -->
                     <a href="#contact" class="nle-nav-track group pt-1.5 border-t border-brand/15">
                         <span class="w-8 text-[11px] font-mono font-bold text-theme-muted group-hover:text-emerald-400">A1</span>
                         <div class="flex-1 flex items-center gap-2.5 pl-[18%]">
@@ -962,7 +962,6 @@
                         </div>
                     </a>
 
-                    <!-- Track A2 -> Opens Instagram Profile -->
                     <a href="https://www.instagram.com/abdosaleh_17/" target="_blank" rel="noopener noreferrer" class="nle-nav-track group">
                         <span class="w-8 text-[11px] font-mono font-bold text-theme-muted group-hover:text-pink-400">A2</span>
                         <div class="flex-1 flex items-center gap-2.5 pl-[10%]">
@@ -979,24 +978,24 @@
     </section>
 
     <!-- =========================================================================
-         3D 3-CARD COVERFLOW FAN PORTFOLIO SECTION (ONLY THE 3 MAIN CATEGORIES)
+         3D 3-CARD COVERFLOW FAN PORTFOLIO (MOUSE HOVER SWITCHING + ARROWS + DOTS)
          ========================================================================= -->
     <section id="portfolio" class="py-20 px-4 overflow-hidden">
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-10">
                 <span class="inline-block px-4 py-1 rounded-full glass text-brand text-xs font-bold uppercase tracking-widest mb-3">
-                    3D INTERACTIVE SHOWCASE
+                    3D INTERACTIVE SHOWCASE • 3 CATEGORIES
                 </span>
                 <h2 class="text-3xl md:text-5xl font-black mb-3">Featured <span class="gradient-text">Portfolio</span></h2>
-                <p class="text-theme-muted text-sm md:text-base">Use the left/right arrows below or click any side card to rotate • Click the center card to open Google Drive</p>
+                <p class="text-theme-muted text-sm md:text-base">Move your mouse left, center, or right across the cards to switch • Click center card to open Google Drive</p>
             </div>
 
-            <!-- 3D Fan Coverflow Stage (3 Main Cards Only) -->
+            <!-- 3D Fan Coverflow Stage (Mouse Hover Scrubbing Enabled) -->
             <div id="coverflow-stage" class="coverflow-stage">
                 <!-- 3 Main Cards dynamically positioned in 3D fan formation by JS -->
             </div>
 
-            <!-- Bottom Controls Bar: Left Arrow + Counter & Active Title + Right Arrow -->
+            <!-- Bottom Controls Bar: Left Arrow + Counter & Dots & Title + Right Arrow -->
             <div class="max-w-xl mx-auto mt-6 flex flex-col items-center text-center">
                 <div class="flex items-center justify-between w-full gap-4 px-2">
                     <!-- Left Circular Arrow Button -->
@@ -1006,11 +1005,18 @@
                         </svg>
                     </button>
 
-                    <!-- Center Counter, Title & Subtitle -->
+                    <!-- Center Counter, 3 Dots, Title & Subtitle -->
                     <div class="flex-1 min-w-0">
-                        <div id="cf-counter" class="text-xs font-mono font-extrabold text-brand tracking-widest mb-1">01 / 03</div>
-                        <h3 id="cf-active-title" class="text-2xl md:text-3xl font-black tracking-tight truncate">🎬 Commercial Edits</h3>
-                        <p id="cf-active-sub" class="text-[11px] md:text-xs font-mono uppercase tracking-widest text-theme-muted mt-1">VIDEO PRODUCTION • PROMOS & REELS</p>
+                        <div class="flex items-center justify-center gap-3 mb-1.5">
+                            <span id="cf-counter" class="text-xs font-mono font-extrabold text-brand tracking-widest">02 / 03</span>
+                            <div class="flex items-center gap-1.5">
+                                <span onclick="setCoverflowIndex(0)" id="cf-dot-0" class="cf-dot" title="01 Commercial Edits"></span>
+                                <span onclick="setCoverflowIndex(1)" id="cf-dot-1" class="cf-dot dot-active" title="02 AI Commercials"></span>
+                                <span onclick="setCoverflowIndex(2)" id="cf-dot-2" class="cf-dot" title="03 Thumbnails & Posters"></span>
+                            </div>
+                        </div>
+                        <h3 id="cf-active-title" class="text-2xl md:text-3xl font-black tracking-tight truncate">⚡ AI Commercials</h3>
+                        <p id="cf-active-sub" class="text-[11px] md:text-xs font-mono uppercase tracking-widest text-theme-muted mt-1">GENERATIVE AI • 3D VISUAL CAMPAIGNS</p>
                     </div>
 
                     <!-- Right Circular Arrow Button -->
@@ -1023,7 +1029,7 @@
 
                 <!-- Direct Google Drive Action Button for Active Center Card -->
                 <div class="mt-6">
-                    <a id="cf-active-link" href="https://drive.google.com/drive/folders/1vB8Ii4RROFm3mtAcQOpeEPGvkdO3GWp9" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-brand hover:bg-orange-600 text-white font-bold text-sm px-7 py-3.5 rounded-2xl transition shadow-lg">
+                    <a id="cf-active-link" href="https://drive.google.com/drive/folders/1zTOmqPmZyX603gBBqxJ2WwJpB4uAv5A7?usp=drive_link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-brand hover:bg-orange-600 text-white font-bold text-sm px-7 py-3.5 rounded-2xl transition shadow-lg">
                         <span>Open Full Folder on Google Drive</span>
                         <span>↗</span>
                     </a>
@@ -1411,7 +1417,7 @@
         renderCursorTrail();
 
         /* =========================================================================
-           1. 3D COVERFLOW FAN PORTFOLIO ENGINE (STRICTLY THE 3 MAIN CATEGORIES)
+           1. 3D COVERFLOW FAN PORTFOLIO ENGINE (3 CATEGORIES + MOUSE HOVER SCRUBBING)
            ========================================================================= */
         const PORTFOLIO_ITEMS = [
             {
@@ -1445,7 +1451,8 @@
         const cfTitle = document.getElementById('cf-active-title');
         const cfSub = document.getElementById('cf-active-sub');
         const cfLink = document.getElementById('cf-active-link');
-        let activeCfIndex = 0;
+        // Start with index 1 in center so 01 is on the left and 03 is on the right
+        let activeCfIndex = 1;
         let cfCardElements = [];
 
         function initCoverflow() {
@@ -1462,12 +1469,18 @@
                         <p class="text-xs text-gray-300 line-clamp-2">${item.desc}</p>
                     </div>
                 `;
+                // Direct hover on any card brings it immediately to center
+                card.addEventListener('mouseenter', () => {
+                    if (activeCfIndex !== idx) {
+                        setCoverflowIndex(idx);
+                    }
+                });
+                // Clicking center card opens Google Drive; clicking side card brings it to center
                 card.addEventListener('click', () => {
                     if (activeCfIndex === idx) {
                         window.open(item.link, '_blank');
                     } else {
-                        activeCfIndex = idx;
-                        updateCoverflowLayout();
+                        setCoverflowIndex(idx);
                     }
                 });
                 cfStage.appendChild(card);
@@ -1476,13 +1489,31 @@
             updateCoverflowLayout();
         }
 
+        // Smooth 3-Zone Mouse Scrubbing across the entire stage (Left -> 01, Center -> 02, Right -> 03)
+        cfStage.addEventListener('mousemove', (e) => {
+            const rect = cfStage.getBoundingClientRect();
+            const relX = (e.clientX - rect.left) / rect.width; // 0.0 to 1.0
+            let targetIdx = 1;
+            if (relX < 0.34) targetIdx = 0;
+            else if (relX > 0.66) targetIdx = 2;
+            else targetIdx = 1;
+
+            if (activeCfIndex !== targetIdx) {
+                setCoverflowIndex(targetIdx);
+            }
+        }, { passive: true });
+
+        function setCoverflowIndex(idx) {
+            activeCfIndex = idx;
+            updateCoverflowLayout();
+        }
+
         function updateCoverflowLayout() {
-            const total = PORTFOLIO_ITEMS.length; // 3 main items
+            const total = PORTFOLIO_ITEMS.length;
             const isMobile = window.innerWidth < 768;
             const xSpacing = isMobile ? 125 : 225;
 
             cfCardElements.forEach((card, i) => {
-                // Exact 3-card circular relative position: 0 (Center), -1 (Left Wing), +1 (Right Wing)
                 let diff = (i - activeCfIndex + total) % total;
                 let offset = 0;
                 if (diff === 1) offset = 1;       // Right Wing
@@ -1496,7 +1527,7 @@
                     card.style.filter = 'brightness(1)';
                 } else {
                     card.classList.remove('is-active');
-                    const sign = Math.sign(offset); // -1 for Left, +1 for Right
+                    const sign = Math.sign(offset);
                     const translateX = sign * xSpacing;
                     const translateY = 18;
                     const translateZ = -90;
@@ -1511,12 +1542,19 @@
                 }
             });
 
-            // Update bottom caption & link
+            // Update bottom caption, link & indicator dots
             const activeItem = PORTFOLIO_ITEMS[activeCfIndex];
             cfCounter.textContent = `${activeItem.num} / 0${total}`;
             cfTitle.textContent = activeItem.title;
             cfSub.textContent = activeItem.sub;
             cfLink.href = activeItem.link;
+
+            for (let d = 0; d < total; d++) {
+                const dot = document.getElementById(`cf-dot-${d}`);
+                if (dot) {
+                    dot.classList.toggle('dot-active', d === activeCfIndex);
+                }
+            }
         }
 
         function moveCoverflow(dir) {
@@ -1525,13 +1563,11 @@
             updateCoverflowLayout();
         }
 
-        // Keyboard Left/Right support
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') moveCoverflow(-1);
             if (e.key === 'ArrowRight') moveCoverflow(1);
         });
 
-        // Touch swipe support on Coverflow stage
         let touchStartX = 0;
         cfStage.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
@@ -1611,7 +1647,7 @@
         }, { passive: true });
 
         /* =========================================================================
-           4. 1-SECOND MASTER TIMELINE INTRO ONLY (NO SECTION REPEAT)
+           4. 1-SECOND MASTER TIMELINE INTRO ONLY
            ========================================================================= */
         const masterIntro = document.getElementById('master-timeline-intro');
 
